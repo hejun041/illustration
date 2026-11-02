@@ -73,6 +73,7 @@ import {
 
 const props = defineProps({
   apiBaseUrl: { type: String, default: '' },
+  matchImageRatio: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(['success']);
@@ -280,7 +281,12 @@ async function submit() {
       image: imagePayload,
       mask: maskPayload,
       prompt: editPrompt.value.trim(),
-      size: '4:3',
+      size: props.matchImageRatio
+        ? ['1:1', '2:3', '3:4', '4:3', '9:16', '16:9'].reduce((best, ratio) => {
+          const value = (item) => { const [w, h] = item.split(':').map(Number); return w / h; };
+          return Math.abs(value(ratio) - naturalW / naturalH) < Math.abs(value(best) - naturalW / naturalH) ? ratio : best;
+        })
+        : '4:3',
       apiBaseUrl: props.apiBaseUrl,
     });
     if (result.points != null && proxy?.$store?.state) {

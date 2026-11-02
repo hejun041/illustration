@@ -428,6 +428,9 @@
                         @error="handleImageError"
                     />
                     <div class="result-actions result-actions--compact">
+                        <button type="button" class="result-btn ghost" @click="openInpaintDialog">
+                            <span>{{ $t('aibooks.inpaintTitle') }}</span>
+                        </button>
                         <button type="button" class="result-btn primary" :disabled="collecting" @click="collectIllustration">
                             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
@@ -517,6 +520,7 @@
                 />
             </div>
         </teleport>
+        <AibooksInpaintDialog ref="inpaintDialogRef" :api-base-url="apiBaseUrl" match-image-ratio @success="onInpaintSuccess" />
     </div>
 </template>
 
@@ -527,6 +531,7 @@ import lazyStyleImage from '@/directives/lazyStyleImage'
 import { illustrationStyleCategory } from '@/data/illustrationStyleClassification'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, ElImageViewer } from 'element-plus'
+import AibooksInpaintDialog from '@/components/aibooks/AibooksInpaintDialog.vue'
 import { checkWebPSupport } from '@/utils/imageOptimizer'
 import {
     postCreateCharacter,
@@ -572,7 +577,7 @@ import {
 export default {
     directives: { lazyStyleImage },
     name: 'AIPicture',
-    components: { ElImageViewer },
+    components: { ElImageViewer, AibooksInpaintDialog },
     setup() {
         const { locale } = useI18n()
         const { styles, loading: stylesLoading } = useIllustrationStyles()
@@ -2022,6 +2027,21 @@ export default {
             } finally {
                 this.downloading = false
             }
+        },
+
+        openInpaintDialog() {
+            if (this.generatedImageUrl) {
+                this.$refs.inpaintDialogRef?.open({ imageUrl: this.generatedImageUrl })
+            }
+        },
+
+        onInpaintSuccess({ imageUrl }) {
+            if (!imageUrl) return
+            this.generatedImageUrl = imageUrl
+            this.imageLoadError = false
+            this.imageLoading = true
+            this.imageReloadKey++
+            this.saveGeneratedImageToLocalStorage(imageUrl)
         },
 
         saveGeneratedImageToLocalStorage(imageUrl) {
