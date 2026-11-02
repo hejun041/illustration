@@ -70,7 +70,7 @@
                 </div>
               </div>
               <div class="book-meta">
-                <h3 class="book-title"><router-link :to="{ name: 'bookdetails', params: { bookId: item._id } }" :title="item.title">{{ item.title }}</router-link></h3>
+                <h3 class="book-title"><a :href="`/books/${item._id}`" :title="item.title">{{ item.title }}</a></h3>
                 <div class="book-meta-bottom">
                   <span class="category-tag" :data-category="item.type">{{ getCategoryLabel(item.type) }}</span>
                   <button
@@ -111,6 +111,7 @@ import BookLoading from '@/components/BookLoading.vue'
 import { mapState } from 'vuex'
 import { ElMessage } from 'element-plus'
 import { getCollectionBook } from '@/api/userCollect'
+import { takePublicPageData } from '@/utils/publicPageData'
 
 export default {
   name: "OriginalBooks",
@@ -229,7 +230,9 @@ export default {
 
     async getBooks() {
       try {
-        const res = await this.$http.get(this.buildBookListUrl(1), { headers: this.getAuthHeaders() })
+        const initial = takePublicPageData('books')
+        if (Array.isArray(initial)) { this.toolArry = this.dedupById(initial); return }
+        const res = await this.$http.get(this.buildBookListUrl(this.num), { headers: this.getAuthHeaders() })
         const raw = Array.isArray(res.data && res.data.message) ? res.data.message : []
         this.toolArry = this.dedupById(raw)
       } catch (err) {
@@ -450,10 +453,11 @@ export default {
       this.emptyPageStreak = 0
     },
 
-    async reloadBooks() {
+    async reloadBooks(startPage = 1) {
       this.loading = true
       this.loadError = false
       this.resetListState()
+      this.num = startPage
       this.$store.commit('removeBooks')
       await this.getBooks()
       await this.fetchCoversForRange(0, this.toolArry.length)
@@ -462,8 +466,7 @@ export default {
     },
 
     async getAllBooks() {
-      this.$router.push({ name: 'books' })
-      await this.reloadBooks()
+      await this.reloadBooks(Math.max(1, Math.min(10000, Number(this.$route.query.page) || 1)))
     },
 
     handleSortChange() {

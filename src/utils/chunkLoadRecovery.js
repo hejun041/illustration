@@ -6,6 +6,15 @@
 export const CHUNK_RELOAD_KEY = 'chunk_reload_ts'
 const RELOAD_COOLDOWN_MS = 10000
 
+// The retry parameter only bypasses the HTML cache for the initial request.
+// Remove it after loading so copied links and later navigation use clean URLs.
+export function clearChunkReloadParameter() {
+  const url = new URL(window.location.href)
+  if (!url.searchParams.has('_chunk_reload')) return
+  url.searchParams.delete('_chunk_reload')
+  window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash)
+}
+
 export function isChunkLoadErrorMessage(message) {
   const msg = String(message || '')
   return /ChunkLoadError|Loading chunk [\d]+ failed|dynamically imported module|Failed to fetch dynamically imported module/i.test(

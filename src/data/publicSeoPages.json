@@ -1,15 +1,51 @@
 {
   "siteUrl": "https://www.kidstory.cc",
   "metadata": [
-    { "path": "/books", "title": "原创绘本作品与故事阅读｜KidStory", "description": "浏览 KidStory 公开绘本作品，阅读故事与插画，了解不同的绘本创作风格。" },
-    { "path": "/illustration", "title": "原创插画作品与画风参考｜KidStory", "description": "浏览 KidStory 公开插画作品，探索画风、角色与故事场景，为自己的绘本创作寻找参考。" },
-    { "path": "/blog", "title": "AI绘本创作教程与插画指南｜KidStory", "description": "阅读 KidStory 创作文章，了解 AI 绘本制作、插画编辑、角色参考与排版导出的使用方法。" },
-    { "path": "/connection", "title": "绘本与插画创作指南｜KidStory", "description": "查看 KidStory 功能说明、操作截图与创作流程，学习从角色、插画到绘本编辑和排版导出。" },
-    { "path": "/websites", "title": "创作工具与网站推荐｜KidStory", "description": "浏览 KidStory 整理的创作工具与网站推荐，为插画、设计与绘本制作寻找资源。" },
-    { "path": "/creator-program", "title": "创作者计划｜KidStory", "description": "了解 KidStory 创作者计划、作品发布与相关参与规则。" },
-    { "path": "/prompt-fill", "title": "插画提示词填充工具｜KidStory", "description": "使用 KidStory 提示词填充工具整理插画创作要求，明确角色、场景与画面细节。" },
-    { "path": "/mood-diary/narrative", "title": "长文心情日记｜KidStory", "description": "使用 KidStory 心情日记工具记录感受与生活片段。" },
-    { "path": "/editorpro", "title": "在线插画编辑器｜KidStory", "description": "使用 KidStory 在线编辑器处理插画、图片与文字，完成创作排版。" }
+    {
+      "path": "/books",
+      "title": "原创绘本作品与故事阅读｜KidStory",
+      "description": "浏览 KidStory 公开绘本作品，阅读故事与插画，了解不同的绘本创作风格。"
+    },
+    {
+      "path": "/illustration",
+      "title": "原创插画作品与画风参考｜KidStory",
+      "description": "浏览 KidStory 公开插画作品，探索画风、角色与故事场景，为自己的绘本创作寻找参考。"
+    },
+    {
+      "path": "/blog",
+      "title": "AI绘本创作教程与插画指南｜KidStory",
+      "description": "阅读 KidStory 创作文章，了解 AI 绘本制作、插画编辑、角色参考与排版导出的使用方法。"
+    },
+    {
+      "path": "/connection",
+      "title": "绘本与插画创作指南｜KidStory",
+      "description": "查看 KidStory 功能说明、操作截图与创作流程，学习从角色、插画到绘本编辑和排版导出。"
+    },
+    {
+      "path": "/websites",
+      "title": "创作工具与网站推荐｜KidStory",
+      "description": "浏览 KidStory 整理的创作工具与网站推荐，为插画、设计与绘本制作寻找资源。"
+    },
+    {
+      "path": "/creator-program",
+      "title": "创作者计划｜KidStory",
+      "description": "了解 KidStory 创作者计划、作品发布与相关参与规则。"
+    },
+    {
+      "path": "/prompt-fill",
+      "title": "插画提示词填充工具｜KidStory",
+      "description": "使用 KidStory 提示词填充工具整理插画创作要求，明确角色、场景与画面细节。"
+    },
+    {
+      "path": "/mood-diary/narrative",
+      "title": "长文心情日记｜KidStory",
+      "description": "使用 KidStory 心情日记工具记录感受与生活片段。"
+    },
+    {
+      "path": "/editorpro",
+      "title": "在线插画编辑器｜KidStory",
+      "description": "使用 KidStory 在线编辑器处理插画、图片与文字，完成创作排版。"
+    }
   ],
   "pages": [
     {
@@ -19,14 +55,124 @@
       "description": "使用 KidStory 创作 AI 绘本：编写故事、设置角色参考、生成逐页插画，再编辑图片与排版导出 PDF。查看制作教程，开始你的绘本创作。",
       "intro": "把故事拆成一页页画面，使用角色参考生成插画，再通过在线编辑和排版工具完成作品。",
       "sections": [
-        { "id": "workflow", "heading": "从故事到绘本的创作流程", "paragraphs": ["先描述故事主题、主角和情节，再检查分镜与提示词，逐页生成插画。图片可以下载，也可以进入在线编辑工具调整，最后通过排版导出工具制作 PDF。", "生成前查看页面的积分提示。AI 图片需要人工检查，角色参考能帮助保持人物特征，但不能保证每页完全一致。"] },
-        { "id": "drafts", "heading": "从已有草稿继续创作", "paragraphs": ["AI 绘本草稿仅保存在当前浏览器，不同步到云端。“我的绘本”会显示本机草稿的生成进度和继续创作入口。请及时下载已有图片，更换设备或清理浏览器数据后无法依靠账号恢复本机草稿。"] }
+        {
+          "id": "workflow",
+          "heading": "从故事到绘本的创作流程",
+          "paragraphs": [
+            "先描述故事主题、主角和情节，再检查分镜与提示词，逐页生成插画。图片可以下载，也可以进入在线编辑工具调整，最后通过排版导出工具制作 PDF。",
+            "生成前查看页面的积分提示。AI 图片需要人工检查，角色参考能帮助保持人物特征，但不能保证每页完全一致。"
+          ]
+        },
+        {
+          "id": "drafts",
+          "heading": "从已有草稿继续创作",
+          "paragraphs": [
+            "AI 绘本草稿仅保存在当前浏览器，不同步到云端。“我的绘本”会显示本机草稿的生成进度和继续创作入口。请及时下载已有图片，更换设备或清理浏览器数据后无法依靠账号恢复本机草稿。"
+          ]
+        }
       ],
       "links": [
-        { "href": "/ai-picture-book", "label": "了解 AI 绘本创作功能" },
-        { "href": "/guides/ai-picture-book-tutorial", "label": "阅读从故事到 PDF 的完整教程" },
-        { "href": "/books", "label": "浏览公开绘本作品" }
-      ]
+        {
+          "href": "/ai-picture-book",
+          "label": "了解 AI 绘本创作功能"
+        },
+        {
+          "href": "/guides/ai-picture-book-tutorial",
+          "label": "阅读从故事到 PDF 的完整教程"
+        },
+        {
+          "href": "/books",
+          "label": "浏览公开绘本作品"
+        },
+        {
+          "href": "/blog",
+          "label": "阅读绘本与插画创作文章"
+        },
+        {
+          "href": "/blog/ai-illustration-without-installing-skills",
+          "label": "把照片做成 AI 插画与拼贴"
+        },
+        {
+          "href": "/guides/ai-picture-book-character-consistency",
+          "label": "AI 绘本如何保持角色一致"
+        },
+        {
+          "href": "/guides/ai-picture-book-storyboard-prompts",
+          "label": "绘本分镜提示词怎么写"
+        },
+        {
+          "href": "/guides/ai-picture-book-pdf-layout",
+          "label": "AI 绘本排版与 PDF 导出"
+        }
+      ],
+      "workflow": {
+        "heading": "一本 AI 绘本，分五步完成",
+        "intro": "输入故事、检查分镜、逐页生成，再编辑和排版。每一步都配有实际操作截图。",
+        "steps": [
+          {
+            "title": "输入故事",
+            "description": "选好主题、页数和画风",
+            "href": "/guides/ai-picture-book-tutorial#story",
+            "image": {
+              "src": "/images/tutorial/ai-picture-book/workflow-story-input.webp",
+              "alt": "AI 绘本故事输入框，填写故事内容与画面要求",
+              "width": 756,
+              "height": 809
+            }
+          },
+          {
+            "title": "检查角色与分镜",
+            "description": "确认主角特征和逐页情节",
+            "href": "/guides/ai-picture-book-tutorial#reference",
+            "image": {
+              "src": "/images/tutorial/ai-picture-book/workflow-characters.webp",
+              "alt": "角色设定卡和主角参考图选择入口",
+              "width": 722,
+              "height": 797
+            }
+          },
+          {
+            "title": "逐页生成插画",
+            "description": "检查画面，调整需要修改的页",
+            "href": "/guides/ai-picture-book-tutorial#generate",
+            "image": {
+              "src": "/images/tutorial/ai-picture-book/workflow-generation.webp",
+              "alt": "逐页插画生成界面，一页完成、其他页等待或生成中",
+              "width": 1200,
+              "height": 655
+            }
+          },
+          {
+            "title": "编辑并保存",
+            "description": "调整文字与画布，保存图片",
+            "href": "/guides/ai-picture-book-tutorial#edit",
+            "image": {
+              "src": "/images/tutorial/ai-picture-book/edit-illustration.webp",
+              "alt": "图片编辑器中调整绘本插画的画布与颜色",
+              "width": 1600,
+              "height": 796
+            }
+          },
+          {
+            "title": "排版导出 PDF",
+            "description": "选择尺寸、整理页序并预览",
+            "href": "/guides/ai-picture-book-tutorial#layout",
+            "image": {
+              "src": "/images/tutorial/ai-picture-book/layout-size.webp",
+              "alt": "排版导出工具中的书本尺寸选择界面",
+              "width": 1600,
+              "height": 789
+            }
+          }
+        ],
+        "link": {
+          "href": "/guides/ai-picture-book-tutorial",
+          "label": "查看教程"
+        }
+      },
+      "image": "/images/tutorial/ai-picture-book/sample-page-1.jpg",
+      "imageAlt": "KidStory AI 绘本创作实例：天空浮岛的魔法集市",
+      "updated": "2026-10-28"
     },
     {
       "path": "/ai-picture-book",
@@ -35,40 +181,633 @@
       "description": "了解 KidStory AI 绘本制作流程：生成故事分镜、设置角色参考、编辑逐页提示词和插画，再使用编辑与排版工具完成作品。",
       "intro": "从一个故事想法开始，逐步完成角色设定、分镜和插画。你可以先了解流程，再登录进入创作工作台。",
       "sections": [
-        { "id": "story", "heading": "先检查故事，再生成图片", "paragraphs": ["输入主角、故事主题和情节要求，选择画风，生成故事与逐页提示词。检查每页发生的事情、人物动作和画面重点，再开始生成插画。", "故事生成与图片生成分开进行，让你在消耗图片生成积分前调整分镜。实际费用以创作页面的积分提示为准。"] },
-        { "id": "characters", "heading": "使用角色设定与参考图", "paragraphs": ["角色设定卡描述人物的外貌、服装与重要特征。已有角色可以作为参考，为故事主角提供视觉依据。", "角色参考有助于保持人物特征，生成结果仍可能出现服装、比例或细节差异。请逐页检查，必要时修改对应页的提示词或使用图片局部编辑。"] },
-        { "id": "edit", "heading": "逐页检查，保留满意的版本", "paragraphs": ["生成后检查插画与故事是否对应。对需要调整的页面修改提示词，再生成图片；局部修改适合处理画面中的具体区域。页面存在多个版本时，可以切换查看。", "重新生成之前先下载满意的图片。网络失败、刷新或任务中断时，应先检查已有结果，不要反复点击生成按钮。"] },
-        { "id": "export", "heading": "编辑图片，排版导出 PDF", "paragraphs": ["AI 绘本页面可以下载已生成的图片。在线编辑工具用于进一步调整图片和文字；排版导出工具用于安排图片顺序、选择纸张规格并导出 PDF。", "这些是不同的操作入口。建议先下载插画作为备份，再导入需要使用的编辑或排版工具，导出后检查顺序、裁切和文字。"] },
-        { "id": "save", "heading": "草稿如何保存？", "paragraphs": ["AI 草稿仅保存在当前浏览器，不上传云端。在同一浏览器进入“我的绘本”，可查看本机草稿并继续创作。", "上传导入的账号绘本与本机 AI 草稿会分别标识来源和保存位置。浏览器存储不是长期备份，请下载重要成果。"] }
+        {
+          "id": "story",
+          "heading": "先检查故事，再生成图片",
+          "paragraphs": [
+            "输入主角、故事主题和情节要求，选择画风，生成故事与逐页提示词。检查每页发生的事情、人物动作和画面重点，再开始生成插画。",
+            "故事生成与图片生成分开进行，让你在消耗图片生成积分前调整分镜。实际费用以创作页面的积分提示为准。"
+          ],
+          "images": [
+            {
+              "src": "/images/tutorial/ai-picture-book/download-pages.webp",
+              "alt": "KidStory 魔法集市绘本的多页生成结果",
+              "caption": "逐页生成插画后，检查结果并下载需要保留的版本。",
+              "width": 1471,
+              "height": 1100
+            }
+          ]
+        },
+        {
+          "id": "characters",
+          "heading": "使用角色设定与参考图",
+          "paragraphs": [
+            "角色设定卡描述人物的外貌、服装与重要特征。已有角色可以作为参考，为故事主角提供视觉依据。",
+            "角色参考有助于保持人物特征，生成结果仍可能出现服装、比例或细节差异。请逐页检查，必要时修改对应页的提示词或使用图片局部编辑。"
+          ]
+        },
+        {
+          "id": "edit",
+          "heading": "逐页检查，保留满意的版本",
+          "paragraphs": [
+            "生成后检查插画与故事是否对应。对需要调整的页面修改提示词，再生成图片；局部修改适合处理画面中的具体区域。页面存在多个版本时，可以切换查看。",
+            "重新生成之前先下载满意的图片。网络失败、刷新或任务中断时，应先检查已有结果，不要反复点击生成按钮。"
+          ]
+        },
+        {
+          "id": "export",
+          "heading": "编辑图片，排版导出 PDF",
+          "paragraphs": [
+            "AI 绘本页面可以下载已生成的图片。在线编辑工具用于进一步调整图片和文字；排版导出工具用于安排图片顺序、选择纸张规格并导出 PDF。",
+            "这些是不同的操作入口。建议先下载插画作为备份，再导入需要使用的编辑或排版工具，导出后检查顺序、裁切和文字。"
+          ]
+        },
+        {
+          "id": "save",
+          "heading": "草稿如何保存？",
+          "paragraphs": [
+            "AI 草稿仅保存在当前浏览器，不上传云端。在同一浏览器进入“我的绘本”，可查看本机草稿并继续创作。",
+            "上传导入的账号绘本与本机 AI 草稿会分别标识来源和保存位置。浏览器存储不是长期备份，请下载重要成果。"
+          ]
+        }
       ],
       "links": [
-        { "href": "/creation-studio/book/ai", "label": "登录并开始 AI 绘本创作" },
-        { "href": "/guides/ai-picture-book-tutorial", "label": "查看完整制作教程与故事示例" },
-        { "href": "/books", "label": "浏览公开绘本作品" }
-      ]
+        {
+          "href": "/creation-studio/book/ai",
+          "label": "登录并开始 AI 绘本创作"
+        },
+        {
+          "href": "/guides/ai-picture-book-tutorial",
+          "label": "查看完整制作教程与故事示例"
+        },
+        {
+          "href": "/books",
+          "label": "浏览公开绘本作品"
+        },
+        {
+          "href": "/guides/ai-picture-book-character-consistency",
+          "label": "AI 绘本如何保持角色一致"
+        },
+        {
+          "href": "/guides/ai-picture-book-storyboard-prompts",
+          "label": "绘本分镜提示词怎么写"
+        },
+        {
+          "href": "/guides/ai-picture-book-pdf-layout",
+          "label": "AI 绘本排版与 PDF 导出"
+        }
+      ],
+      "image": "/images/tutorial/ai-picture-book/sample-page-1.jpg",
+      "imageAlt": "KidStory AI 绘本创作实例：天空浮岛的魔法集市",
+      "updated": "2026-10-28"
     },
     {
       "path": "/guides/ai-picture-book-tutorial",
-      "title": "如何用AI制作绘本：从故事、角色参考到PDF导出｜KidStory",
-      "heading": "如何用 AI 制作一本绘本：从故事到 PDF",
-      "description": "用一个小熊寻找雨后彩虹的故事，学习 AI 绘本制作：故事提示词、角色设定、逐页分镜、图片修改、本机草稿与 PDF 排版导出。",
-      "intro": "下面用“小熊寻找雨后彩虹”作为创作练习，说明从故事到导出的操作顺序。示例提示词可以直接改写使用，实际图片效果取决于模型、画风与角色参考。",
+      "title": "AI绘本制作教程：故事分镜、逐页插画与PDF导出｜KidStory",
+      "heading": "AI 绘本制作教程：从故事分镜到 PDF 导出",
+      "description": "跟着 KidStory 操作截图制作 AI 绘本：输入故事和画风，检查角色卡与逐页分镜，生成和编辑插画，再选择尺寸、整理页面并导出 PDF。",
+      "intro": "制作一本 AI 绘本，可以按“故事与画风 → 角色与分镜 → 逐页插画 → 编辑保存 → 排版导出”完成。下面用《天空浮岛的魔法集市》演示故事、分镜和插画操作，再说明如何把保存好的图片排成 PDF。",
       "sections": [
-        { "id": "prepare", "heading": "1. 先确定主题、读者和主角", "paragraphs": ["打开 AI 绘本工作台并登录。先想清楚故事要讲给谁听，主角遇到什么困难，最后发生什么变化。第一本作品适合从简短故事开始，降低检查与修改成本。"], "example": "写一个适合 4—6 岁儿童阅读的短篇绘本故事：小熊雨后想找彩虹，沿路帮助小兔和小鸟，最后和朋友一起看见彩虹。语言简短、情节温暖，围绕同一只小熊展开；每个场景只表达一个主要动作。" },
-        { "id": "story", "heading": "2. 选择画风并生成故事", "paragraphs": ["把故事要求填入提示词，选择画风后点击生成。生成后先阅读故事和各页提示词，不要立刻开始生成全部图片。", "检查开头、经过和结尾是否连贯，删去难以用一个画面表达的复杂动作。页数和具体分镜以当前生成结果为准。"] },
-        { "id": "reference", "heading": "3. 固定角色特征，选择参考角色", "paragraphs": ["检查角色设定卡。把主角的毛色、耳朵、衣服等关键特征写具体，避免不同页使用互相矛盾的描述。已有角色可以从角色选择入口加入参考。", "参考图能提供视觉依据，但不能保证角色在每一页完全相同。不要把人物一致性理解成无需检查。"], "example": "主角小熊：浅棕色毛发，圆耳朵，穿黄色雨衣和红色雨靴，背绿色小书包。后续每页沿用这些特征，不更换服装或毛色。" },
-        { "id": "prompts", "heading": "4. 把每页提示词写成一个清楚的画面", "paragraphs": ["每页重点说明谁在做什么、位于哪里，以及需要保留的角色特征。画风沿用选定设置，不要在不同页交替使用冲突的画风要求。", "文字故事与图片提示词分开检查。画面中需要准确呈现的标题、对白等文字，适合在后续编辑阶段添加。"], "example": "浅棕色小熊穿黄色雨衣、红色雨靴，背绿色小书包，站在雨后的森林小路旁，伸手帮助一只小兔跨过浅水坑。画面重点是小熊帮助小兔，背景保留湿润树叶与柔和天空，画面内不添加文字。" },
-        { "id": "generate", "heading": "5. 生成插画，逐页检查再修改", "paragraphs": ["确认角色卡和各页提示词后开始生成图片。检查人物特征、手脚、场景逻辑以及画面与故事是否对应。先下载满意的图片作为备份。", "如果某页不满意，可以修改对应页的提示词再生成；只需修改局部时使用局部编辑。存在多个版本时，可切换版本比较。重新生成前保留已有下载，避免把一次重试当成备份。"] },
-        { "id": "resume", "heading": "6. 暂停创作时，确认本机草稿与下载", "paragraphs": ["AI 草稿仅保存在当前浏览器。同一浏览器中打开“我的绘本”，找到标注“本机草稿”的条目，点击“继续创作”可恢复已保存的内容。", "草稿不跨设备同步。清理网站数据、使用无痕模式或浏览器存储不可用时，不能依靠账号找回本机草稿。若出现保存失败提示，保持页面打开，优先下载已有图片。", "刷新页面不代表能够自动接回正在生成的远程任务。中断后先查看已保存页面与生成历史，确认结果后再决定是否重试，避免重复消耗积分。"] },
-        { "id": "layout", "heading": "7. 导入图片，排版并导出 PDF", "paragraphs": ["使用“下载所有图片”保存已生成结果。需要调整图片或文字时，进入在线编辑工具导入图片并编辑，完成后保存导出文件。", "进入绘本的排版导出入口，按需要上传或选择图片，检查页面顺序，确认纸张规格、空白页与裁切方式，然后导出 PDF。请以各工具当前显示的操作为准，这些入口不是自动连续完成的流水线。", "打开导出的 PDF 逐页检查：封面是否正确、顺序是否完整、文字是否被裁切、图片是否清晰。准备打印时，再按印刷方要求确认尺寸、出血和色彩。"] },
-        { "id": "checklist", "heading": "完成前的检查清单", "items": ["故事开头、经过、结尾完整，每页画面与文字对应。", "主角关键特征保持一致，已检查多余肢体与明显画面错误。", "满意的图片已经下载，本机草稿没有被当成云端备份。", "导出的 PDF 已打开检查，页序、纸张规格和裁切符合用途。"] }
+        {
+          "id": "story",
+          "heading": "1. 输入故事，选择页数和画风",
+          "paragraphs": [
+            "登录后进入创作工作台的“绘本 → AI 绘本”。在提示词框里写出主角、故事发生的地方、遇到的问题和结尾。已有故事可以直接输入；只有想法时，也要给出一条清楚的情节线。",
+            "本例让几位小魔法师来到天空浮岛的集市，发现商贩的物品被魔法弄乱，再用观察和协作恢复秩序。选择正文页数和画风后，点击“生成提示词”，先得到角色设定与每页情节。正文页数不含封面。"
+          ],
+          "example": "故事想法示例：天空浮岛的集市上，一道魔法闪光把面包师、鞋匠和水果摊的物品弄乱了。几位小魔法师一起寻找线索，帮助摊主把物品放回原处。画面以黑白线稿为主，搭配浅蓝色，人物服装和配色保持连贯。",
+          "images": [
+            {
+              "src": "/images/tutorial/ai-picture-book/story-style.webp",
+              "alt": "KidStory AI 绘本工作台中的画风选择、生成提示词按钮和角色卡",
+              "caption": "先确定故事与画风，再生成角色设定和逐页提示词。",
+              "width": 1600,
+              "height": 795
+            }
+          ]
+        },
+        {
+          "id": "reference",
+          "heading": "2. 检查角色设定卡和逐页分镜",
+          "paragraphs": [
+            "在角色设定卡中核对名字、发型、服装、随身物品等特征。例如，同一位小魔法师的帽子、长袍和魔杖不要在不同页变成另一套设定。已有角色参考图时，可从“我的角色”选择；没有参考图也可以先完善文字设定。",
+            "逐页阅读图片生成提示词，确认每页是谁、在哪里、做什么。画面要求尽量集中在一个主要动作；多角色故事可在分镜开头写“出场角色：莉莉、托比、波比”，避免把没有出场的人物也画进去。",
+            "角色参考有助于保持特征，生成后仍要逐页检查。先改好不合理的情节，再生成插画，可以减少整页重做。"
+          ],
+          "images": [
+            {
+              "src": "/images/tutorial/ai-picture-book/characters-scenes.webp",
+              "alt": "角色设定卡、两个主角参考图入口与逐页图片提示词",
+              "caption": "角色设定集中维护，逐页提示词说明当页出场角色和主要动作。",
+              "width": 1600,
+              "height": 796
+            },
+            {
+              "src": "/images/tutorial/ai-picture-book/page-prompts.webp",
+              "alt": "可逐页修改和删除的图片生成提示词列表",
+              "caption": "在生成图片之前，检查每页情节和画面描述。",
+              "width": 1600,
+              "height": 796
+            }
+          ]
+        },
+        {
+          "id": "generate",
+          "heading": "3. 生成插画，逐页检查结果",
+          "paragraphs": [
+            "确认分镜后开始生成图片。右侧会逐页显示等待、生成中和已完成的状态。第一张完成时，其他页面仍可能在生成，不需要重复提交整本任务。",
+            "检查主角的外貌与服装、动作是否合理，以及画面是否对应当页文字。需要改变情节或重做画面时，先修改对应页的提示词；只需局部调整时，可使用该页的“AI 修改”入口。",
+            "有页面失败时，先查看已有结果和错误提示，再重试需要处理的页。生成前查看页面的积分提示。"
+          ],
+          "images": [
+            {
+              "src": "/images/tutorial/ai-picture-book/page-generation.webp",
+              "alt": "魔法集市第一张插画已完成，其他页处于生成中和等待状态",
+              "caption": "逐页检查生成进度与结果，不要把等待状态误认为整本失败。",
+              "width": 1600,
+              "height": 796
+            }
+          ]
+        },
+        {
+          "id": "download",
+          "heading": "4. 下载图片，或收集到“我的插画”",
+          "paragraphs": [
+            "需要本地备份时，点击结果区的“下载所有图片”。下载后的单页可包含插画与下方故事文字，保存后检查是否缺页、文字是否完整。",
+            "需要在账号的插画列表中继续使用某张图时，点击该页的“收集插画”。它保存的是纯插画，图片下方的故事文字不会一起收集。后续进入排版工具时，可以选择这些已保存的插画。"
+          ],
+          "images": [
+            {
+              "src": "/images/tutorial/ai-picture-book/download-pages.webp",
+              "alt": "魔法集市多页结果与右上角下载所有图片按钮",
+              "caption": "下载全部用于本地备份；收集插画用于把单张纯插画保存到“我的插画”。",
+              "width": 1471,
+              "height": 1100
+            },
+            {
+              "src": "/images/tutorial/ai-picture-book/finished-page.webp",
+              "alt": "魔法集市下载单页，插画下方附有中文故事文字",
+              "caption": "下载后的图文单页：文字已在图片下方，排版时留意是否重复添加。",
+              "width": 1222,
+              "height": 1100
+            }
+          ]
+        },
+        {
+          "id": "edit",
+          "heading": "5. 用图片编辑器调整画布和文字",
+          "paragraphs": [
+            "需要调整版面时，打开图片编辑器，导入已下载的插画，或从已保存的素材中选择图片。左侧选择画布尺寸，右侧调整背景和颜色，再根据需要添加故事文字。",
+            "如果导入的是已带文字的单页，先检查原文字是否要保留；如果用的是收集后的纯插画，需要另行添加当页故事。完成后保存或下载编辑结果，再进入排版导出。"
+          ],
+          "images": [
+            {
+              "src": "/images/tutorial/ai-picture-book/edit-illustration.webp",
+              "alt": "图片编辑器中的魔法集市插画及画布尺寸、颜色设置",
+              "caption": "同一故事的插画进入图片编辑器后，可继续调整画布和排版。",
+              "width": 1600,
+              "height": 796
+            }
+          ]
+        },
+        {
+          "id": "layout",
+          "heading": "6. 选择尺寸、整理页面，导出 PDF",
+          "paragraphs": [
+            "进入创作工作台的“绘本 → 排版导出”，根据作品用途选择书本尺寸。横向画面可先看横向绘本选项；已有明确印刷规格时，按要求设置尺寸，避免排版完成后再大幅裁切。",
+            "从已保存的插画中选择所需图片；本地编辑好的图片按工具当前提供的导入方式加入。核对封面和正文页的顺序，进入预览后检查裁切、留白和文字位置，再使用 PDF 下载入口导出。",
+            "图片编辑与排版导出是不同入口，这些入口不是自动连续完成的流水线。下载全部图片也不等于已经导出整本 PDF。",
+            "打开 PDF 逐页检查是否缺页、顺序是否正确、文字是否清晰。若选择纯插画排版，确认故事文字已经补上；若使用图文单页，确认文字没有被裁掉。"
+          ],
+          "images": [
+            {
+              "src": "/images/tutorial/ai-picture-book/layout-size.webp",
+              "alt": "排版导出工具中的儿童书、章节书与横向绘本尺寸选项",
+              "caption": "先确定尺寸，再选图、核对页序并预览。",
+              "width": 1600,
+              "height": 789
+            },
+            {
+              "src": "/images/tutorial/ai-picture-book/pdf-file.webp",
+              "alt": "本地保存的天空浮岛的魔法集市 PDF 文件缩略图",
+              "caption": "本地 PDF 文件示例；导出后打开文件检查所有页面。",
+              "width": 275,
+              "height": 264
+            }
+          ]
+        },
+        {
+          "id": "resume",
+          "heading": "暂停创作前，保存好图片与草稿",
+          "paragraphs": [
+            "AI 草稿仅保存在当前浏览器。同一浏览器进入“我的绘本”，可查看本机草稿并继续创作；清理网站数据、更换设备或使用无痕模式后，不能依靠账号恢复这些本机草稿。",
+            "“本机 AI 草稿”“已收集的插画”和“下载到电脑的文件”是不同的保存位置。离开页面前，下载重要图片，确认需要继续使用的插画已保存。"
+          ]
+        },
+        {
+          "id": "checklist",
+          "heading": "导出前核对四件事",
+          "items": [
+            "角色外貌、服装和道具前后连贯，插画对应当页故事。",
+            "封面和正文页顺序正确，没有缺页或重复页。",
+            "故事文字完整、清晰，画面裁切没有遮住主体。",
+            "图片与最终 PDF 已保存到本地，并打开检查。"
+          ]
+        }
       ],
       "links": [
-        { "href": "/creation-studio/book/ai", "label": "登录并按教程开始创作" },
-        { "href": "/ai-picture-book", "label": "了解 AI 绘本功能与保存方式" },
-        { "href": "/creation-studio/book/topdf", "label": "进入绘本排版导出" },
-        { "href": "/connection", "label": "查看其他创作指南" }
-      ]
+        {
+          "href": "/creation-studio/book/ai",
+          "label": "开始制作 AI 绘本"
+        },
+        {
+          "href": "/creation-studio/book/topdf",
+          "label": "进入排版导出"
+        },
+        {
+          "href": "/ai-picture-book",
+          "label": "查看 AI 绘本功能"
+        },
+        {
+          "href": "/guides/ai-picture-book-character-consistency",
+          "label": "AI 绘本如何保持角色一致"
+        },
+        {
+          "href": "/guides/ai-picture-book-storyboard-prompts",
+          "label": "绘本分镜提示词怎么写"
+        },
+        {
+          "href": "/guides/ai-picture-book-pdf-layout",
+          "label": "AI 绘本排版与 PDF 导出"
+        }
+      ],
+      "workflow": {
+        "heading": "一本 AI 绘本，分五步完成",
+        "intro": "输入故事、检查分镜、逐页生成，再编辑和排版。每一步都配有实际操作截图。",
+        "steps": [
+          {
+            "title": "输入故事",
+            "description": "选好主题、页数和画风",
+            "href": "/guides/ai-picture-book-tutorial#story",
+            "image": {
+              "src": "/images/tutorial/ai-picture-book/workflow-story-input.webp",
+              "alt": "AI 绘本故事输入框，填写故事内容与画面要求",
+              "width": 756,
+              "height": 809
+            }
+          },
+          {
+            "title": "检查角色与分镜",
+            "description": "确认主角特征和逐页情节",
+            "href": "/guides/ai-picture-book-tutorial#reference",
+            "image": {
+              "src": "/images/tutorial/ai-picture-book/workflow-characters.webp",
+              "alt": "角色设定卡和主角参考图选择入口",
+              "width": 722,
+              "height": 797
+            }
+          },
+          {
+            "title": "逐页生成插画",
+            "description": "检查画面，调整需要修改的页",
+            "href": "/guides/ai-picture-book-tutorial#generate",
+            "image": {
+              "src": "/images/tutorial/ai-picture-book/workflow-generation.webp",
+              "alt": "逐页插画生成界面，一页完成、其他页等待或生成中",
+              "width": 1200,
+              "height": 655
+            }
+          },
+          {
+            "title": "编辑并保存",
+            "description": "调整文字与画布，保存图片",
+            "href": "/guides/ai-picture-book-tutorial#edit",
+            "image": {
+              "src": "/images/tutorial/ai-picture-book/edit-illustration.webp",
+              "alt": "图片编辑器中调整绘本插画的画布与颜色",
+              "width": 1600,
+              "height": 796
+            }
+          },
+          {
+            "title": "排版导出 PDF",
+            "description": "选择尺寸、整理页序并预览",
+            "href": "/guides/ai-picture-book-tutorial#layout",
+            "image": {
+              "src": "/images/tutorial/ai-picture-book/layout-size.webp",
+              "alt": "排版导出工具中的书本尺寸选择界面",
+              "width": 1600,
+              "height": 789
+            }
+          }
+        ],
+        "link": {
+          "href": "/guides/ai-picture-book-tutorial",
+          "label": "查看教程"
+        }
+      },
+      "image": "/images/tutorial/ai-picture-book/sample-page-1.jpg",
+      "imageAlt": "KidStory AI 绘本创作实例：天空浮岛的魔法集市",
+      "updated": "2026-10-28"
+    },
+    {
+      "path": "/guides/ai-picture-book-character-consistency",
+      "title": "AI 绘本如何保持角色一致：角色卡、参考图与逐页检查｜KidStory",
+      "heading": "AI 绘本如何保持角色一致：角色卡、参考图与逐页检查",
+      "description": "用角色设定卡固定发型、服装和道具，配合参考图编写每页提示词。提供可复制的角色描述、跨页检查方法和局部修正步骤。",
+      "intro": "先固定角色的发型、服装、配色与随身物品，再改变动作和场景。生成第二页之前，把第一页作为检查基准；发现问题时只调整对应页，不必重做整本绘本。",
+      "updated": "2026-10-28",
+      "sections": [
+        {
+          "id": "character-card",
+          "heading": "先写一张可以重复使用的角色卡",
+          "paragraphs": [
+            "角色名字不足以描述外貌。把发型、服装颜色、鞋子和标志性道具写成固定描述，每页沿用同一组词；情绪、动作和镜头距离放到分镜中单独写。",
+            "下面是一份可修改的示例设定，并非截图中人物的逐字提示词。将名字与特征换成自己的主角后，再用于各页。"
+          ],
+          "example": "角色卡示例：莉莉，短黑发、齐刘海，戴浅蓝色尖顶帽，穿浅蓝色长袍和棕色短靴，携带星形魔杖。画风为黑白线稿搭配浅蓝色。每页保持这些外貌、服装与道具特征。",
+          "images": [
+            {
+              "src": "/images/tutorial/ai-picture-book/characters-scenes.webp",
+              "alt": "KidStory 角色设定卡与逐页分镜编辑界面",
+              "caption": "在角色卡里维护固定特征，在分镜里描述当页动作。",
+              "width": 1600,
+              "height": 796
+            }
+          ]
+        },
+        {
+          "id": "reference",
+          "heading": "在 KidStory 中选择主角参考图",
+          "paragraphs": [
+            "进入“创作工作台 → 绘本 → AI 绘本”，先生成并检查角色卡与逐页提示词。已有角色时，从“我的角色”选择参考图，再核对它与文字设定是否一致。",
+            "参考图应能看清需要保持的特征。若帽子遮住了脸或衣服被道具挡住，先换一张特征更清楚的图。不要同时保留互相矛盾的文字设定与参考图。"
+          ],
+          "images": [
+            {
+              "src": "/images/tutorial/ai-picture-book/workflow-characters.webp",
+              "alt": "角色卡中的主角参考图入口",
+              "caption": "先核对角色卡，再选择对应主角的参考图。",
+              "width": 722,
+              "height": 797
+            }
+          ]
+        },
+        {
+          "id": "page-prompts",
+          "heading": "每页只改场景、动作和表情",
+          "paragraphs": [
+            "提示词先写出场角色，再写地点、主要动作和构图。主角穿同一套衣服时，不要在第二页把“浅蓝色长袍”改成“蓝色外套”。",
+            "多角色场景只列当页出现的人。一个页面先安排一个主要动作，减少把多个时间点同时画进一张图的情况。"
+          ],
+          "example": "第 2 页提示词示例：出场角色：莉莉（沿用角色卡）。地点：天空浮岛的面包摊前。动作：莉莉举起星形魔杖，指向漂浮的面包。构图：中景，画面右下方留出文字区域。沿用黑白线稿与浅蓝色配色。"
+        },
+        {
+          "id": "compare",
+          "heading": "逐页对照五个位置",
+          "paragraphs": [
+            "先下载满意的第一页，检查后续页面时与它并排对照。按同一顺序检查，能更快定位变化。"
+          ],
+          "items": [
+            "脸型与发型：刘海、发长和轮廓是否变化。",
+            "帽子与服装：款式、长度和颜色是否一致。",
+            "道具：魔杖是否缺失，是否被换成其他物品。",
+            "角色比例：同框人物的相对身高是否突然改变。",
+            "画风与配色：线条和主色是否与前页连贯。"
+          ]
+        },
+        {
+          "id": "repair",
+          "heading": "局部问题改局部，整页错误再重做",
+          "paragraphs": [
+            "衣服或道具的一处细节出错，可以先用该页的“AI 修改”入口处理具体区域；出场角色或主要动作错误时，先改该页提示词，再重新生成。",
+            "修改前下载满意版本。角色参考不能保证每页完全一致，最终以逐页核对后的图片为准。"
+          ]
+        }
+      ],
+      "links": [
+        {
+          "href": "/ai-picture-book",
+          "label": "查看 AI 绘本制作功能"
+        },
+        {
+          "href": "/guides/ai-picture-book-tutorial",
+          "label": "查看完整制作教程"
+        },
+        {
+          "href": "/guides/ai-picture-book-storyboard-prompts",
+          "label": "绘本分镜提示词怎么写"
+        },
+        {
+          "href": "/guides/ai-picture-book-pdf-layout",
+          "label": "AI 绘本排版与 PDF 导出"
+        }
+      ],
+      "image": "/images/tutorial/ai-picture-book/characters-scenes.webp",
+      "imageAlt": "KidStory 角色设定卡与逐页分镜"
+    },
+    {
+      "path": "/guides/ai-picture-book-storyboard-prompts",
+      "title": "绘本分镜提示词怎么写：六页故事与逐页示例｜KidStory",
+      "heading": "绘本分镜提示词怎么写：六页故事与逐页示例",
+      "description": "把一个故事拆成六页，每页写清出场角色、地点、动作、构图与文字位置。附角色卡和可修改的逐页提示词示例，说明如何在 KidStory 中检查分镜。",
+      "intro": "把“一个故事”改写为“每一页发生什么”。先列六页情节，每页保留一个主要动作，再补角色、场景与构图要求。下面用“找回风筝”演示；这些是可修改的写作示例。",
+      "updated": "2026-10-28",
+      "sections": [
+        {
+          "id": "outline",
+          "heading": "先定故事线，再填画面细节",
+          "paragraphs": [
+            "故事设定：小兔米米的黄色风筝挂到树上。它先尝试拉线，再邀请小熊帮忙，最后一起取下风筝并到空地继续放飞。",
+            "先把六页故事写完整，再生成插画。每一页应推动下一步：发现问题、尝试、遇阻、协作、解决、结束。不要在第一页就同时要求起飞、挂树、求助和取回。"
+          ],
+          "items": [
+            "第 1 页：米米在草地上放飞风筝。",
+            "第 2 页：风筝挂在树枝上，米米抬头看。",
+            "第 3 页：米米拉风筝线，风筝仍挂在树上。",
+            "第 4 页：米米请路过的小熊一起想办法。",
+            "第 5 页：小熊用长树枝托起风筝，米米收线。",
+            "第 6 页：两位朋友在远离树木的空地重新放飞风筝。"
+          ]
+        },
+        {
+          "id": "template",
+          "heading": "一页提示词写清五件事",
+          "paragraphs": [
+            "建议用固定顺序：出场角色 → 地点 → 主要动作 → 构图 → 画风与文字位置。先描述画面里能看到的内容，再补情绪，避免只写“勇敢”“友谊”等抽象词。",
+            "角色卡示例：米米是白色小兔，穿红色背带裤；小熊是棕色小熊，穿绿色背心。道具固定为黄色菱形风筝与白色风筝线。"
+          ],
+          "example": "通用模板：出场角色：[名字与固定外貌]。地点：[具体场景]。主要动作：[一个清楚的动作]。构图：[远景/中景/近景与人物位置]。画风：[统一风格与配色]。文字位置：[留白区域]。"
+        },
+        {
+          "id": "examples",
+          "heading": "将同一模板用于不同页面",
+          "paragraphs": [
+            "第 2 页：出场角色：白色小兔米米，红色背带裤。地点：草地边的大树下。主要动作：米米握着白色风筝线，抬头看挂在树枝上的黄色菱形风筝。构图：中景，树枝与风筝在画面上方。画风：水彩绘本。底部留白，用于后期添加故事文字。",
+            "第 5 页：出场角色：米米与穿绿色背心的棕色小熊。地点：同一棵大树下。主要动作：小熊用长树枝托起黄色菱形风筝，米米在旁边收线。构图：中景，两位角色和风筝都在画面内。沿用水彩画风，底部留白。",
+            "故事文字可以后期添加到留白区，避免要求画面同时生成复杂的中文排版。"
+          ]
+        },
+        {
+          "id": "kidstory",
+          "heading": "在 KidStory 中先检查分镜，再生成图片",
+          "paragraphs": [
+            "登录后进入“创作工作台 → 绘本 → AI 绘本”，输入故事主题、主角与结局，选择页数和画风，点击“生成提示词”。正文页数不含封面。",
+            "阅读角色卡与每页提示词，逐页检查出场角色、道具和情节顺序。需要调整时，先编辑对应页；确认故事能连起来，再开始生成插画。"
+          ],
+          "images": [
+            {
+              "src": "/images/tutorial/ai-picture-book/page-prompts.webp",
+              "alt": "KidStory 可逐页编辑的图片生成提示词列表",
+              "caption": "逐页检查提示词，把多个时间点拆开。",
+              "width": 1600,
+              "height": 796
+            }
+          ]
+        },
+        {
+          "id": "fix",
+          "heading": "这三类描述最容易让画面混乱",
+          "paragraphs": [
+            "动作太多：“米米奔跑、风筝挂树、朋友赶来并成功取下”。拆成不同页，一页保留一个主要动作。",
+            "角色不清：“他们开心地解决问题”。改成角色名字、各自位置和正在做的动作。",
+            "前后矛盾：前页写黄色菱形风筝，后页写红色三角风筝。生成前统一角色卡和道具描述。"
+          ]
+        }
+      ],
+      "links": [
+        {
+          "href": "/ai-picture-book",
+          "label": "查看 AI 绘本制作功能"
+        },
+        {
+          "href": "/guides/ai-picture-book-tutorial",
+          "label": "查看完整制作教程"
+        },
+        {
+          "href": "/guides/ai-picture-book-character-consistency",
+          "label": "AI 绘本如何保持角色一致"
+        },
+        {
+          "href": "/guides/ai-picture-book-pdf-layout",
+          "label": "AI 绘本排版与 PDF 导出"
+        }
+      ],
+      "image": "/images/tutorial/ai-picture-book/page-prompts.webp",
+      "imageAlt": "KidStory 绘本分镜提示词编辑界面"
+    },
+    {
+      "path": "/guides/ai-picture-book-pdf-layout",
+      "title": "AI 绘本如何排版导出 PDF：尺寸、页序与文字检查｜KidStory",
+      "heading": "AI 绘本如何排版导出 PDF：尺寸、页序与文字检查",
+      "description": "将 AI 绘本插画整理成 PDF：区分图文单页与纯插画，选择书本尺寸、核对封面与正文顺序、检查裁切和文字，再导出并逐页验收。",
+      "intro": "先确认手里的图片有没有故事文字，再选择书本尺寸、整理封面和正文顺序。KidStory 的图片下载、图片编辑与 PDF 排版是不同入口，需要按步骤保存和导入。",
+      "updated": "2026-10-28",
+      "sections": [
+        {
+          "id": "prepare",
+          "heading": "先分清图文单页和纯插画",
+          "paragraphs": [
+            "AI 绘本结果区的“下载所有图片”可保存带故事文字的单页；“收集插画”保存的是纯插画，不包含下方故事文字。两种素材可以采用不同排版方式。",
+            "图文单页：导入后检查原有文字是否清楚、是否被裁切，不要再重复添加同一段故事。纯插画：在编辑时另行添加当页故事，保存好图文结果再进入排版。"
+          ],
+          "images": [
+            {
+              "src": "/images/tutorial/ai-picture-book/finished-page.webp",
+              "alt": "下载后的绘本图文单页，故事文字位于插画下方",
+              "caption": "导入前先确认图片是否已经带文字。",
+              "width": 1222,
+              "height": 1100
+            }
+          ]
+        },
+        {
+          "id": "size",
+          "heading": "先选尺寸，再安排画面",
+          "paragraphs": [
+            "进入“创作工作台 → 绘本 → 排版导出”，根据原图方向与用途选择书本尺寸。横向构图优先考虑横向版式，竖向构图优先考虑竖向版式，减少大幅裁切。",
+            "需要印刷时，先向印刷方确认成品尺寸、出血和文件要求，再开始排版。页面尺寸确定后，先用一张带文字的代表页检查，确认文字与主体都能保留再整理全书。"
+          ],
+          "images": [
+            {
+              "src": "/images/tutorial/ai-picture-book/layout-size.webp",
+              "alt": "KidStory 排版导出界面中的书本尺寸选项",
+              "caption": "尺寸与原图方向尽量一致，先检查一页再排整本。",
+              "width": 1600,
+              "height": 789
+            }
+          ]
+        },
+        {
+          "id": "order",
+          "heading": "按封面与正文顺序整理素材",
+          "paragraphs": [
+            "可先在电脑上把文件命名为“00-封面、01-正文、02-正文……”以便核对。加入排版工具后仍需检查实际顺序，不能只依赖文件名推断。",
+            "从已保存插画中选择所需图片；本地编辑好的图片按工具当前提供的导入方式加入。把每页故事文字与对应图片逐一对照，删除重复页，补齐缺页。"
+          ]
+        },
+        {
+          "id": "edit",
+          "heading": "需要补字或调画布时，先用图片编辑器",
+          "paragraphs": [
+            "打开图片编辑器，导入需要处理的图片，调整画布并添加文字。先统一各页文字的位置和大小，再保存或下载编辑结果。",
+            "正文不要紧贴页面边缘。遇到插画主体占满画面时，可以先增加留白，避免直接把文字压在人物脸部或关键道具上。"
+          ],
+          "images": [
+            {
+              "src": "/images/tutorial/ai-picture-book/edit-illustration.webp",
+              "alt": "KidStory 图片编辑器中的绘本插画与画布设置",
+              "caption": "完成图文编辑并保存结果，再进入 PDF 排版。",
+              "width": 1600,
+              "height": 796
+            }
+          ]
+        },
+        {
+          "id": "export",
+          "heading": "预览后导出，并打开文件逐页检查",
+          "paragraphs": [
+            "核对书本尺寸、封面和正文顺序后，进入预览并使用 PDF 下载入口。保存后打开 PDF，从封面翻到最后一页检查；不要只确认下载成功。",
+            "若某页被裁切，回到该页调整画面或版式后重新导出。若文字模糊，先检查原始图文图片，反复导出不能恢复原图中已经缺失的细节。"
+          ],
+          "items": [
+            "页数：封面和正文都在，没有重复页或空白页。",
+            "顺序：每段故事与对应插画一致，情节连续。",
+            "裁切：脸部、手部、关键道具与文字没有被切掉。",
+            "文字：没有遗漏、重复或错字，放大后仍能阅读。",
+            "保存：最终 PDF 和原始插画都已下载到本地。"
+          ],
+          "images": [
+            {
+              "src": "/images/tutorial/ai-picture-book/pdf-file.webp",
+              "alt": "本地保存的绘本 PDF 文件示例",
+              "caption": "导出后打开文件检查，不只查看文件缩略图。",
+              "width": 275,
+              "height": 264
+            }
+          ]
+        }
+      ],
+      "links": [
+        {
+          "href": "/ai-picture-book",
+          "label": "查看 AI 绘本制作功能"
+        },
+        {
+          "href": "/guides/ai-picture-book-tutorial",
+          "label": "查看完整制作教程"
+        },
+        {
+          "href": "/guides/ai-picture-book-character-consistency",
+          "label": "AI 绘本如何保持角色一致"
+        },
+        {
+          "href": "/guides/ai-picture-book-storyboard-prompts",
+          "label": "绘本分镜提示词怎么写"
+        }
+      ],
+      "image": "/images/tutorial/ai-picture-book/layout-size.webp",
+      "imageAlt": "KidStory 绘本排版尺寸选择界面"
     }
   ]
 }

@@ -11,4 +11,4 @@ Disallow: /create-layout-illustration
 Disallow: /character-group-images
 Disallow: /forgot-password
 
-Sitemap: https://www.kidstory.cc/sitemap.xml
+Sitemap: https://www.kidstory.cc/sitemap-pages.xml

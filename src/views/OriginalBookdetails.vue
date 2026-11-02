@@ -286,6 +286,8 @@
 </template>
 
 <script>
+import { takePublicPageData } from '@/utils/publicPageData'
+import { applyPublicDetailSeo } from '@/utils/seo'
 // @ is an alias to /src
 
 
@@ -531,6 +533,8 @@ export default {
    //获取绘本详情
       async getBooks() {
       try {
+        const initial = takePublicPageData('books')
+        if (initial && !Array.isArray(initial)) { this.bookDetails = initial; applyPublicDetailSeo(initial, this.$route.path); return }
         // 获取 token 并添加到请求头
         const token = localStorage.getItem('token');
         const headers = {};
@@ -542,6 +546,7 @@ export default {
         console.log(res)
         //对象数组，对象包含绘本的name\id\content\description等
         this.bookDetails = res.data.message
+        applyPublicDetailSeo(this.bookDetails, this.$route.path)
 
       } catch (err) {
         this.loading = false
@@ -863,6 +868,7 @@ performCancelCollect(bookId, collectRecordId) {
 
 // 加载收藏记录映射
 async loadCollectIdMap() {
+  if (!localStorage.getItem('id') || !localStorage.getItem('token') || localStorage.getItem('token') === 'undefined') return;
   try {
     const userId = localStorage.getItem("id");
     const res = await this.$http.get(`/user/list/collect?id=${userId}&category=book`, {

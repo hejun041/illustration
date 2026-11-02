@@ -128,3 +128,11 @@ EditorPro 面向普通创作者设计：拖拽式排版、预设画布尺寸、A
 ---
 
 **开始创作：** [www.kidstory.cc](https://www.kidstory.cc/) · 需要帮助？查看 [创作指南](https://www.kidstory.cc/connection)
+
+2026-10-29 Google 提交记录：D:/ranran_program/backups/kidstory-google-20261029/submission-ledger.json。PDF指南、/blog、ai-illustration-without-installing-skills已收到请求索引成功回执；不可重复提交。已请求不等于已收录。百度清单独立位于kidstory-baidu-20261028。地图111个唯一URL/96篇文章；prebuild自动刷新公开文章。
+
+2026-10-29 教程入口和转化统计上线：/admin/analytics，来源/首次落地页/教程/入口/工具/创作/生成/导出按会话去重。独立数据目录 /home/ubuntu/data/kidstory-analytics（90天保留），管理员访问不计入。说明和部署记录：D:/ranran_program/backups/kidstory-conversion-20261029。现有Google三页成功请求记录不变，不重复请求。
+
+2026-10-29 用户撤销统计后台：已移除 /admin/analytics、侧栏入口、所有新增转化埋点和 /_analytics 接口；停止统计。上方统计上线说明仅为历史记录，不应重新启用。教程CTA和登录后继续创作保留。
+
+2026-10-29 改用Google Analytics4，G-B2T5QWFRTM，资源561397479；直接发送page_view/tutorial_cta/creation_start/export_start/export_complete/export_failed。创建与导出完成标为按会话统计的关键事件；增强自动衡量关闭避免SPA重复计数。文档D:/ranran_program/backups/kidstory-ga4-20261029/ga4-setup-guide.txt。独立统计后台仍已删除。

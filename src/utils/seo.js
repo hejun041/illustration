@@ -50,6 +50,10 @@ export function applyRouteSeo(route) {
   setMeta('og:url', canonicalForPath(route.path))
   setMeta('twitter:title', title)
   setMeta('twitter:description', description)
+  const image = `${SEO.siteUrl}${page?.image || '/android-chrome-512x512.png'}`
+  setMeta('og:image', image)
+  setMeta('og:image:alt', page?.imageAlt || 'KidStory 插画与绘本创作平台')
+  setMeta('twitter:image', image)
   const isPrivate = route.matched.some(record => record.meta?.requiresAuth) || /^\/(user|member|creation-studio)(\/|$)/.test(route.path)
   setMeta('robots', isPrivate || route.name === 'NotFound' ? 'noindex, follow' : 'index, follow')
 }
@@ -63,6 +67,21 @@ function setMeta(name, content) {
     document.head.appendChild(element)
   }
   element.setAttribute('content', content)
+}
+
+export function applyPublicDetailSeo(item, pathname) {
+  if (!item?.title || typeof document === 'undefined') return
+  const title = `${item.seoTitle || item.title}｜${SEO.siteName}`
+  const description = item.metaDescription || item.excerpt || item.description || item.title
+  document.title = title
+  setLinkRel('canonical', canonicalForPath(pathname))
+  setMeta('description', description)
+  setMeta('og:title', title)
+  setMeta('og:description', description)
+  setMeta('og:url', canonicalForPath(pathname))
+  setMeta('twitter:title', title)
+  setMeta('twitter:description', description)
+  setMeta('robots', 'index, follow')
 }
 
 export { setLinkRel, canonicalForPath, setMeta }

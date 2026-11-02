@@ -455,6 +455,7 @@
 
 <script>
 import { mapState } from 'vuex';
+import { trackAnalytics } from '@/utils/googleAnalytics';
 import { ElMessage } from 'element-plus';
 import {
   formatSizeLabel,
@@ -1104,18 +1105,24 @@ export default {
     downPDF() {
       if (!this.validateCompliance()) return;
       if (!this.editablePages.length) return;
+      if (this.exporting) return;
+      void trackAnalytics('export_start', { tool: 'layout', format: 'pdf' });
 
       this.exporting = true;
       ElMessage.info(this.$t('toPdf.downloading'));
 
       buildBookPdfFromPages(this.buildExportPages(), this.activeFormat, 'digital')
         .then((pdf) => {
-          pdf.save(`${this.exportFileBaseName()}-300dpi.pdf`);
+          return pdf.save(`${this.exportFileBaseName()}-300dpi.pdf`, { returnPromise: true });
+        })
+        .then(() => {
+          void trackAnalytics('export_complete', { tool: 'layout', format: 'pdf' });
           ElMessage.success(this.$t('toPdf.downloadDone'));
         })
         .catch((err) => {
           console.error(err);
           ElMessage.error(this.$t('toPdf.downloadFailed'));
+          void trackAnalytics('export_failed', { tool: 'layout', format: 'pdf' });
         })
         .finally(() => {
           this.exporting = false;
@@ -1124,6 +1131,8 @@ export default {
     downImages() {
       if (!this.validateCompliance()) return;
       if (!this.editablePages.length) return;
+      if (this.exporting) return;
+      void trackAnalytics('export_start', { tool: 'layout', format: 'png' });
 
       this.exporting = true;
       ElMessage.info(this.$t('toPdf.downloadingImages'));
@@ -1136,10 +1145,12 @@ export default {
       )
         .then(() => {
           ElMessage.success(this.$t('toPdf.downloadImagesDone'));
+          void trackAnalytics('export_complete', { tool: 'layout', format: 'png' });
         })
         .catch((err) => {
           console.error(err);
           ElMessage.error(this.$t('toPdf.downloadImagesFailed'));
+          void trackAnalytics('export_failed', { tool: 'layout', format: 'png' });
         })
         .finally(() => {
           this.exporting = false;
@@ -2181,3 +2192,4 @@ export default {
   }
 }
 </style>
+

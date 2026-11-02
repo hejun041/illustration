@@ -39,6 +39,31 @@ test('tutorial explicitly explains local-only drafts and separate export steps',
   assert.ok(guide.sections.length >= 7)
   assert.ok(html.includes('清理网站数据'))
 })
+
+test('workflow destinations resolve to tutorial sections and screenshot files exist', () => {
+  const guide = catalog.pages.find(page => page.path === '/guides/ai-picture-book-tutorial')
+  const home = catalog.pages.find(page => page.path === '/')
+  for (const step of home.workflow.steps) {
+    const [pathname, id] = step.href.split('#')
+    assert.equal(pathname, guide.path)
+    assert.ok(guide.sections.some(section => section.id === id), `Missing section: ${id}`)
+  }
+  const images = guide.sections.flatMap(section => section.images || [])
+  assert.ok(images.length > 0)
+  for (const image of images) {
+    assert.ok(image.src.startsWith('/images/tutorial/'))
+    assert.ok(fs.existsSync(path.join(__dirname, '../public', image.src)))
+    assert.ok(image.width > 0 && image.height > 0 && image.alt)
+  }
+  const html = renderPublicHtml(template, guide)
+  for (const image of images) assert.ok(html.includes(`src="${image.src}"`), 'Screenshots must be discoverable before JS')
+  for (const step of home.workflow.steps) {
+    assert.ok(step.image?.alt, 'Each workflow step needs its matching screenshot')
+    assert.ok(fs.existsSync(path.join(__dirname, '../public', step.image.src)))
+  }
+  const homeHtml = renderPublicHtml(template, home)
+  assert.ok(homeHtml.includes(`property="og:image" content="${catalog.siteUrl}${home.image}"`))
+})
 test('client navigation resets description, canonical and robots for each route', () => {
   const nodes = new Map()
   const document = {
@@ -68,6 +93,26 @@ test('client navigation resets description, canonical and robots for each route'
   assert.equal(nodes.get('meta[name="robots"]').attributes.content, 'index, follow')
   assert.equal(nodes.get('link[rel="canonical"]').href, catalog.siteUrl + '/books')
   assert.equal(nodes.get('meta[name="description"]').attributes.content, catalog.metadata[0].description)
+  assert.equal(nodes.get('meta[property="og:image"]').attributes.content, catalog.siteUrl + '/android-chrome-512x512.png')
+  ctx.apply(route('/'))
+  assert.equal(nodes.get('meta[property="og:image"]').attributes.content, catalog.siteUrl + catalog.pages[0].image)
+})
+
+test('normal section anchors survive startup while legacy hash routes still redirect', () => {
+  const source = fs.readFileSync(path.resolve(__dirname, '../src/main.js'), 'utf8')
+  const implementation = source.slice(source.indexOf('function redirectLegacyHashRoutes()'), source.indexOf('\nredirectLegacyHashRoutes()'))
+  for (const [pathname, hash, expected] of [
+    ['/guides/ai-picture-book-tutorial', '#reference', null],
+    ['/guides/ai-picture-book-tutorial', '#story', null],
+    ['/', '#/books', 'https://www.kidstory.cc/books?test=1'],
+    ['/', '', null],
+    ['/index.html', '#/books', null],
+  ]) {
+    let redirected = null
+    const window = { location: { origin: 'https://www.kidstory.cc', pathname, hash, search: '?test=1', replace(url) { redirected = url } } }
+    vm.runInNewContext(implementation + '\nredirectLegacyHashRoutes()', { window })
+    assert.equal(redirected, expected)
+  }
 })
 if (process.env.SEO_BUILD_DIR) {
   test('production output contains static HTML, independent metadata and discoverable URLs', () => {
@@ -80,6 +125,20 @@ if (process.env.SEO_BUILD_DIR) {
     }
     assert.ok(!fs.readFileSync(path.join(directory, 'app.html'), 'utf8').includes('rel="canonical"'))
     const sitemap = fs.readFileSync(path.join(directory, 'sitemap.xml'), 'utf8')
+    assert.equal(fs.readFileSync(path.join(directory, 'sitemap-pages.xml'), 'utf8'), sitemap)
     for (const page of catalog.pages) assert.ok(sitemap.includes(`${catalog.siteUrl}${page.path}`))
+    const locations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => match[1])
+    assert.equal(locations.length, new Set(locations).size, 'Sitemap URLs must not be duplicated')
   })
 }
+
+test('chunk recovery cleanup preserves real query parameters, anchors and router state', () => {
+  const source = fs.readFileSync(path.resolve(__dirname, '../src/utils/chunkLoadRecovery.js'), 'utf8')
+    .replace(/export const /g, 'const ').replace(/export function /g, 'function ')
+  const state = { current: '/mood-diary/recap', position: 3 }
+  let replaced
+  const window = { location: { href: 'https://www.kidstory.cc/mood-diary/recap?page=2&_chunk_reload=123#entry' }, history: { state, replaceState(...args) { replaced = args } } }
+  vm.runInNewContext(source + '\nclearChunkReloadParameter()', { window, URL })
+  assert.equal(replaced[0], state)
+  assert.equal(replaced[2], '/mood-diary/recap?page=2#entry')
+})

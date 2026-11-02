@@ -33,6 +33,11 @@ fi
 JS_COUNT=$(ls dist/js/*.js 2>/dev/null | wc -l)
 echo "构建产物: ${JS_COUNT} 个 JS 文件"
 
+# 正文服务缓存应用模板与路由清单，构建后须刷新。首次安装按 deploy/CADDY.md 操作。
+if systemctl list-unit-files kidstory-seo.service --no-legend | grep -q kidstory-seo; then
+  sudo systemctl restart kidstory-seo
+fi
+
 # 5. 校验懒加载 chunk 存在且为 JS（非 index.html 回退）
 UPLOAD_BOOK_CHUNK=$(ls dist/js/upload-local-book.*.js 2>/dev/null | head -1)
 if [ -z "$UPLOAD_BOOK_CHUNK" ]; then
@@ -70,6 +75,16 @@ check_http_code "${SITE}/books" "200" "SPA 路由 /books" || SMOKE_FAILED=1
 check_http_code "${SITE}/blog" "200" "SPA 路由 /blog" || SMOKE_FAILED=1
 check_http_code "${SITE}/sitemap.xml" "200" "sitemap.xml" || SMOKE_FAILED=1
 check_http_code "${SITE}/robots.txt" "200" "robots.txt" || SMOKE_FAILED=1
+check_http_code "${SITE}/__missing_page__" "404" "不存在的页面" || SMOKE_FAILED=1
+check_http_code "${SITE}/blog/__missing_post__" "404" "不存在的文章" || SMOKE_FAILED=1
+check_http_code "${SITE}/books/not-a-valid-id" "404" "无效作品编号" || SMOKE_FAILED=1
+
+for PUBLIC_PATH in books blog illustration; do
+  if ! curl -fsS --max-time 20 "${SITE}/${PUBLIC_PATH}" | grep -q '<h1>'; then
+    echo "错误: /${PUBLIC_PATH} 未返回可抓取正文"
+    SMOKE_FAILED=1
+  fi
+done
 
 FIRST_JS=$(ls dist/js/*.js 2>/dev/null | head -1)
 if [ -n "$FIRST_JS" ]; then

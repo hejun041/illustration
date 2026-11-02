@@ -27,6 +27,7 @@ export async function fetchBlogPosts(http, opts = {}) {
   const root = resolveApiRoot(opts.apiBaseUrl)
   const params = {}
   if (opts.limit) params.limit = opts.limit
+  if (opts.page) params.page = opts.page
   const res = await http.get(`${root}/api/blog/`, {
     params,
     timeout: 30000,

@@ -20,6 +20,8 @@
                 </section>
             </div>
 
+            <BookWorkflow />
+
             <!-- 创作工作台介绍 -->
             <section class="showcase showcase--workbench">
                 <div class="showcase-inner">
@@ -119,10 +121,11 @@
 
 <script>
 import PublicSeoContent from '@/components/PublicSeoContent.vue'
+import BookWorkflow from '@/components/BookWorkflow.vue'
 
 export default {
     name: 'Home',
-    components: { PublicSeoContent },
+    components: { PublicSeoContent, BookWorkflow },
     data() {
         return {
             featureArt: {

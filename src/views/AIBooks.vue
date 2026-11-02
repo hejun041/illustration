@@ -334,6 +334,7 @@ import { ElMessage } from 'element-plus'
 import { getCurrentInstance } from 'vue'
 import { useI18n } from 'vue-i18n'
 import axios from 'axios'
+import { trackAnalytics } from '@/utils/googleAnalytics'
 import { Download, Edit, DocumentCopy, Reading } from '@element-plus/icons-vue'
 import {
     postCreateCharacter,
@@ -470,6 +471,9 @@ export default {
     mounted() {
         // 页面加载时从本地存储恢复数据
         this.loadFromLocalStorage();
+        if (this.$route.query.sample === 'forest' && !this.form.prompt?.trim() && !this.storyData) {
+            this.form.prompt = '小熊第一次独自去森林找朋友，途中遇到下雨的小兔子。它们一起用树叶搭起小伞，最后明白了互相帮助的快乐。请写成适合亲子共读的温暖故事。';
+        }
         this.fetchMyCharacters();
         // 设置自动保存
         this.setupAutoSave();
@@ -559,6 +563,7 @@ export default {
             }
             
             try { buildStoryGuide(this.form.targetPages) } catch (error) { ElMessage.warning(error.message); return }
+            void trackAnalytics('creation_start', { tool: 'book' })
             this.storyDraft = null
             this.storyData = null
             this.generating = true
@@ -1397,6 +1402,7 @@ export default {
             }
             
             this.downloading = true;
+            void trackAnalytics('export_start', { tool: 'book', format: 'png' });
             ElMessage.info('正在准备下载，请稍候...');
             
             try {
@@ -1432,14 +1438,18 @@ export default {
                 }
                 
                 if (okCount === 0) {
+                    void trackAnalytics('export_failed', { tool: 'book', format: 'png' });
                     ElMessage.error('下载失败：图片无法读取（跨域），请确认已部署图片代理后重试');
                 } else if (okCount < images.filter(Boolean).length) {
+                    void trackAnalytics('export_failed', { tool: 'book', format: 'png' });
                     ElMessage.warning(`已下载 ${okCount} 张，其余失败已跳过`);
                 } else {
+                    void trackAnalytics('export_complete', { tool: 'book', format: 'png' });
                     ElMessage.success(`已成功下载 ${okCount} 张图片`);
                 }
             } catch (error) {
                 console.error('下载图片失败:', error);
+                void trackAnalytics('export_failed', { tool: 'book', format: 'png' });
                 ElMessage.error('下载失败，请重试');
             } finally {
                 this.downloading = false;
@@ -2320,3 +2330,4 @@ export default {
     }
 }
 </style>
+

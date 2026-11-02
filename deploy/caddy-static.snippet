@@ -2,5 +2,7 @@
 # 操作说明：deploy/CADDY.md
 #
 # 核心规则（不可颠倒顺序）：
-#   @static → file_server（/js /css /sitemap.xml 等）
-#   handle  → try_files {path}/index.html {path} /app.html（静态公开页优先，其他 Vue History 路由使用无 canonical 的外壳）
+#   @crawlFiles → file_server（/robots.txt /sitemap.xml /sitemap-pages.xml，no-cache）
+#   @static → file_server（/js /css 等）
+#   handle → reverse_proxy 127.0.0.1:4100（公开正文渲染、有效应用路由与真实 404）
+# 先启动 kidstory-seo.service；不要再使用无条件的 /app.html fallback。

@@ -215,7 +215,11 @@ export default {
                 localStorage.setItem('wechat_state', state)
                 
                 // 2. 保存当前页面，用于登录后跳转
-                const currentPath = window.location.pathname + window.location.search
+                let currentPath = window.location.pathname + window.location.search
+                try {
+                    const pending = sessionStorage.getItem('kidstory-pending-creation')
+                    if (/^\/creation-studio\/book\/(ai|topdf)(\?sample=forest)?$/.test(pending || '')) currentPath = pending
+                } catch { /* use the current page */ }
                 if (currentPath !== '/wechat/callback') {
                     localStorage.setItem('wechat_redirect', currentPath)
                 }

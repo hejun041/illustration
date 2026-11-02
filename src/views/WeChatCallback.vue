@@ -199,6 +199,7 @@ export default {
           // 跳转到首页或之前的页面（优先使用 localStorage 中保存的 redirect）
           // 使用 replace 而不是 push，避免在历史记录中留下回调页面
           const redirect = localStorage.getItem('wechat_redirect') || route.query.redirect || '/'
+          try { sessionStorage.removeItem('kidstory-pending-creation') } catch { /* storage optional */ }
           localStorage.removeItem('wechat_redirect')
           
           // 使用 router.replace 进行跳转，确保状态已更新

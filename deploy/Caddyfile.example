@@ -26,15 +26,21 @@ www.kidstory.cc {
 	header @private X-Robots-Tag "noindex, follow"
 
 	# 静态资源：直接 file_server，禁止 fallback 到 index.html
-	@static path /img/* /fonts/* /js/* /css/* /favicon* /android-chrome* /apple-touch-icon* /site.webmanifest /sitemap.xml /robots.txt
+	# 抓取入口单独处理，避免落入应用服务或静态资源长期缓存规则。
+	@crawlFiles path /robots.txt /sitemap.xml /sitemap-pages.xml
+	handle @crawlFiles {
+		header Cache-Control "no-cache, must-revalidate"
+		file_server
+	}
+	@static path /img/* /images/* /blog-assets/* /fonts/* /js/* /css/* /favicon* /android-chrome* /apple-touch-icon* /site.webmanifest /sitemap.xml /robots.txt
 	handle @static {
 		file_server
 	}
 
-	# 公开页优先读取独立 HTML，其余 Vue History 路由使用无 canonical 的 SPA 外壳
+	# 公开内容实时渲染；仅已知 Vue 路由返回应用外壳，其他地址返回真实 404。
+	# 必须先启动 deploy/kidstory-seo.service，再切换此配置。
 	handle {
-		try_files {path}/index.html {path} /app.html
-		file_server
+		reverse_proxy 127.0.0.1:4100
 	}
 
 	@hashedAssets path_regexp hashedAssets ^/(js|css|img|fonts)/.*\.[a-f0-9]{8}\.[^/]+$

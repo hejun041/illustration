@@ -48,6 +48,8 @@
 //import RightInfo from "../components/RightInfo.vue";
 import Suggestion from "../components/Suggestion.vue";
 import { mapState } from 'vuex'
+import { takePublicPageData } from '@/utils/publicPageData'
+import { applyPublicDetailSeo } from '@/utils/seo'
 import { getCollectionIllus, getLikeIllus, getAttention } from '@/api/userCollect'
 
 export default {
@@ -58,7 +60,7 @@ export default {
   },
   data(){
     return{
-     id:this.$router.currentRoute.params.illId,
+     id:this.$route.params.illId,
      userid:localStorage.getItem("id"),
       illusDetails:[],
       authorDetails:[],
@@ -72,8 +74,11 @@ export default {
   methods:{
     async getIllusDetails(){ 
       try{  
+        const initial = takePublicPageData('illustration')
+        if (initial && !Array.isArray(initial)) { this.illusDetails = initial; applyPublicDetailSeo(initial, this.$route.path); return }
         let res=await this.$http.get(`/ill/`+this.id)
-        this.illusDetails=res.data.message 
+        this.illusDetails=res.data.message
+        applyPublicDetailSeo(this.illusDetails, this.$route.path)
       } catch(err){
         console.log(err)
       }

@@ -1,0 +1,18 @@
+[Unit]
+Description=KidStory public HTML renderer
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/www/illustration
+Environment=NODE_ENV=production
+Environment=SEO_PORT=4100
+ExecStart=/usr/bin/node scripts/public-seo-server.cjs
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
+

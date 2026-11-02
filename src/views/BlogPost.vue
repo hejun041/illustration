@@ -38,6 +38,7 @@
 
 <script>
 import { fetchBlogPost } from '@/utils/blogApi'
+import { takePublicPageData } from '@/utils/publicPageData'
 import { SEO, setLinkRel, canonicalForPath, applyRouteSeo } from '@/utils/seo'
 
 export default {
@@ -77,7 +78,7 @@ export default {
       }
       this.loading = true
       try {
-        const post = await fetchBlogPost(this.$http, slug)
+        const post = takePublicPageData('blog') ?? await fetchBlogPost(this.$http, slug)
         if (requestId !== this.requestId) return
         this.post = post
         if (this.post?.slug && this.post.slug !== slug) {

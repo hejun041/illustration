@@ -5,6 +5,7 @@ import { illustrationPreviewUrl, markIllustrationThumbnailFailed } from './utils
 import router from './router'
 import customComponents from '@/custom-component' // 注册自定义组件
 import store from './store'
+import { installGoogleAnalytics } from './utils/googleAnalytics'
 // 基础重置样式应最先加载，避免覆盖第三方组件样式
 import '@/styles/reset.css'
 // 响应式断点 token 与公共工具类（需在业务样式之前引入）
@@ -27,7 +28,7 @@ import i18n from './i18n'
 // import 'animate.css/animate.css'
 import '@/assets/lefticon/iconfont.css'
 import axios from 'axios'
-import { installChunkLoadRecovery } from '@/utils/chunkLoadRecovery'
+import { installChunkLoadRecovery, clearChunkReloadParameter } from '@/utils/chunkLoadRecovery'
 import {
   extractErrorMessage,
   isInsufficientPointsErrorObject,
@@ -36,10 +37,12 @@ import {
 } from '@/utils/insufficientPoints'
 
 installChunkLoadRecovery();
+clearChunkReloadParameter();
 
 // History 路由：兼容旧 #/ 链接，301 式 replace 到无 hash 路径
 function redirectLegacyHashRoutes() {
   const { origin, pathname, search, hash } = window.location
+  if (!hash.startsWith('#/')) return
   const hashPath = (hash || '').replace(/^#/, '').replace(/^\/?/, '')
   if (!hashPath || hashPath === '/') return
   if (/\.[a-zA-Z0-9]+$/.test(pathname)) return
@@ -50,6 +53,16 @@ function redirectLegacyHashRoutes() {
 redirectLegacyHashRoutes()
 
 const app = createApp(App)
+installGoogleAnalytics(router)
+store.subscribe((mutation) => {
+  if (mutation.type !== 'hasLogin' || mutation.payload !== true) return
+  if (window.location.pathname === '/wechat/callback') return
+  try {
+    const target = sessionStorage.getItem('kidstory-pending-creation')
+    sessionStorage.removeItem('kidstory-pending-creation')
+    if (/^\/creation-studio\/book\/(ai|topdf)(\?sample=forest)?$/.test(target || '')) router.push(target)
+  } catch { /* normal login remains available */ }
+})
 app.directive('lazy-image', lazyImage)
 app.config.globalProperties.$illustrationPreview = illustrationPreviewUrl
 app.config.globalProperties.$thumbnailFailed = markIllustrationThumbnailFailed
@@ -132,3 +145,4 @@ app.mount('#app')
 
 // 图标按需导入，不再全局注册所有图标
 // 各组件需要使用时自行导入所需的图标组件
+

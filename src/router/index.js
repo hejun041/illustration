@@ -27,6 +27,21 @@ const routes = [{
         component: () => import(/* webpackChunkName: "public-seo-pages" */ '../views/PublicSeoPage.vue'),
     },
     {
+        path: '/guides/ai-picture-book-character-consistency',
+        name: 'ai-picture-book-character-consistency',
+        component: () => import(/* webpackChunkName: "public-seo-pages" */ '../views/PublicSeoPage.vue'),
+    },
+    {
+        path: '/guides/ai-picture-book-storyboard-prompts',
+        name: 'ai-picture-book-storyboard-prompts',
+        component: () => import(/* webpackChunkName: "public-seo-pages" */ '../views/PublicSeoPage.vue'),
+    },
+    {
+        path: '/guides/ai-picture-book-pdf-layout',
+        name: 'ai-picture-book-pdf-layout',
+        component: () => import(/* webpackChunkName: "public-seo-pages" */ '../views/PublicSeoPage.vue'),
+    },
+    {
         path: '/wechat/callback',
         name: 'WeChatCallback',
         component: () => import(/* webpackChunkName: "wechat-callback" */ '../views/WeChatCallback.vue')
@@ -693,6 +708,9 @@ router.beforeEach((to, from, next) => {
         const token = localStorage.getItem("token")
         const cango = (to.name == 'Home' || to.name == 'books' || to.name == 'illustration' || to.name == 'connection')
         if ((!token || token == "undefined") && (!cango)) {
+            if (to.path === '/creation-studio/book/ai' || to.path === '/creation-studio/book/topdf') {
+                try { sessionStorage.setItem('kidstory-pending-creation', to.fullPath) } catch { /* storage optional */ }
+            }
             store.state.isMask = true
             next(false)
             return
@@ -712,3 +730,4 @@ router.onError((error) => {
 })
 
 export default router
+

@@ -28,7 +28,7 @@
                 @click="toDetail(item._id)"
               />
               <div class="data">
-                <span class="name">{{ item.title }}</span>
+                <a class="name" :href="`/illustration/${item._id}`">{{ item.title }}</a>
                 <div class="icon"
                   ><span v-if="likeIllusArr.includes(item._id)" ><i class="iconfont icon-aixin1" style="color:#F489B5"></i></span>
                   <span v-else><i  class="iconfont icon-aixin" @click="likeIllusFun(item._id)"></i></span></div
@@ -48,6 +48,7 @@
 
 import { mapState } from 'vuex'
 import { getCollectionIllus, getLikeIllus } from '@/api/userCollect'
+import { takePublicPageData } from '@/utils/publicPageData'
 
 export default {
   name: "OriginalIllustration",
@@ -57,7 +58,7 @@ export default {
     return {
       userid:localStorage.getItem("id"),
       illsArry: [],
-      num: 1,
+      num: Math.max(1, Math.min(10000, Number(this.$route.query.page) || 1)),
       sortList: [
         {
           value: "default",
@@ -83,14 +84,13 @@ export default {
     ]),
   methods: {
     toDetail(id) {
-      this.$router.push({
-        name: "illusdetails",
-        params: { illId: id },
-      });
+      window.location.assign(`/illustration/${id}`);
     },
     getIllus() {
+      const initial = takePublicPageData('illustration')
+      if (Array.isArray(initial)) { this.illsArry = initial; return }
       this.$http
-        .get(`/ill/?sort_param=heat&sort_num=desc&page=1`)
+        .get(`/ill/public?page=${this.num}`)
         .then((response) => {
           this.illsArry = response.data.message;
           console.log(this.illsArry);
@@ -101,7 +101,7 @@ export default {
       this.num++;
       try {
         let res = await this.$http.get(
-          `/ill/?sort_param=heat&sort_num=desc&page=` + this.num
+          `/ill/public?page=` + this.num
         );
         console.log(res.data.message);
         this.illsArry = this.illsArry.concat(res.data.message);

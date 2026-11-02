@@ -29,7 +29,7 @@
             <p v-if="item.categories?.length" class="blog-categories">
               <span v-for="cat in item.categories" :key="cat">{{ cat }}</span>
             </p>
-            <h2>{{ item.title }}</h2>
+            <h2><a :href="`/blog/${encodeURIComponent(item.slug)}`" @click.stop>{{ item.title }}</a></h2>
             <p>{{ item.excerpt }}</p>
             <time v-if="item.publishedAt" class="blog-date">{{ formatDate(item.publishedAt) }}</time>
           </div>
@@ -37,11 +37,16 @@
         </div>
       </article>
     </section>
+    <nav aria-label="文章分页">
+      <a v-if="currentPage > 1" :href="currentPage > 2 ? `/blog?page=${currentPage - 1}` : '/blog'">上一页</a>
+      <a v-if="items.length >= 100" :href="`/blog?page=${currentPage + 1}`">下一页</a>
+    </nav>
   </div>
 </template>
 
 <script>
 import { fetchBlogPosts } from '@/utils/blogApi'
+import { takePublicPageData } from '@/utils/publicPageData'
 
 export default {
   name: 'BlogList',
@@ -49,6 +54,7 @@ export default {
     return {
       loading: true,
       items: [],
+      currentPage: Math.max(1, Math.min(10000, Number(this.$route.query.page) || 1)),
     }
   },
   async created() {
@@ -58,7 +64,7 @@ export default {
     async loadList() {
       this.loading = true
       try {
-        const list = await fetchBlogPosts(this.$http, { limit: 100 })
+        const list = takePublicPageData('blog') ?? await fetchBlogPosts(this.$http, { limit: 100, page: this.currentPage })
         this.items = Array.isArray(list) ? list : []
       } catch (e) {
         this.items = []
@@ -69,7 +75,7 @@ export default {
     },
     goPost(slug) {
       if (!slug) return
-      this.$router.push({ name: 'blog-post', params: { slug } })
+      window.location.assign(`/blog/${encodeURIComponent(slug)}`)
     },
     formatDate(value) {
       if (!value) return ''
