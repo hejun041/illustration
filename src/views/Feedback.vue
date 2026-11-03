@@ -22,8 +22,7 @@
       <div class="feedback-side">
       <header class="feedback-hero">
         <div class="hero-copy">
-          <h1>{{ $t('feedback.heroTitle') }}</h1>
-          <p>{{ $t('feedback.heroSubtitle') }}</p>
+          <h1 :class="{ 'hero-title-zh': $i18n.locale !== 'en' }">{{ $t('feedback.heroTitle') }}</h1>
         </div>
       </header>
 
@@ -117,8 +116,8 @@ export default {
 .feedback-side { width: min(100% - 64px, 450px); margin: 0 auto; padding: 90px 0; box-sizing: border-box; }
 .feedback-hero { padding: 0 0 80px; text-align: center; }
 .hero-copy { max-width: 720px; margin: 0 auto; }
-.hero-copy h1 { margin: 0 0 16px; color: #291c16; font-size: clamp(30px, 3.2vw, 42px); line-height: 1.25; letter-spacing: -.025em; }
-.hero-copy p { margin: 0 auto; max-width: 620px; color: #76665e; font-size: 16px; line-height: 1.8; }
+.hero-copy h1 { margin: 0; color: #291c16; font-size: clamp(20px, 2.25vw, 32px); line-height: 1.25; letter-spacing: -.025em; }
+.hero-title-zh { white-space: nowrap; }
 
 .panel { overflow: hidden; border: 2px solid #291c16; border-radius: 24px; background: #fff9f1; box-shadow: 5px 5px 0 #291c16; }
 .panel-heading { padding: 28px 30px 20px; }
@@ -179,8 +178,7 @@ export default {
   .feedback-side { order: -1; width: 100%; padding: 36px 20px 40px; background: #fff; }
   .board { width: 100%; padding: 36px 20px 60px; }
   .feedback-hero { padding: 0 0 28px; }
-  .hero-copy h1 { font-size: 28px; }
-  .hero-copy p { font-size: 14px; }
+  .hero-copy h1 { font-size: clamp(18px, 6vw, 28px); }
   .panel-heading { padding: 23px 22px 17px; }
   .board-heading { padding: 2px 2px 17px; }
   .board-body { padding: 0 5px 5px 0; }
