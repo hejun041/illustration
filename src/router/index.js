@@ -133,7 +133,7 @@ const routes = [{
         name: 'feedback',
         component: () =>
             import(/* webpackChunkName: "feedback" */ '../views/Feedback.vue'),
-        meta: { seoTitle: '投诉建议', requiresAuth: true },
+        meta: { seoTitle: '意见建议', requiresAuth: true },
     },
     {
         path: '/guides',
