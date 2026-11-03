@@ -94,7 +94,16 @@
                                 </el-button>
                             </el-button-group>
                             
-                            <el-button-group style="margin-left: 12px;">
+                            <el-button-group class="layer-controls">
+                                <el-button size="small" :disabled="!canMoveLayer(-1)" @click="moveLayer(-1)">
+                                    {{ $t('createLayoutIllustration.layerBackward') }}
+                                </el-button>
+                                <el-button size="small" :disabled="!canMoveLayer(1)" @click="moveLayer(1)">
+                                    {{ $t('createLayoutIllustration.layerForward') }}
+                                </el-button>
+                            </el-button-group>
+
+                            <el-button-group>
                                 <el-dropdown @command="applyPresetLayout">
                                     <el-button size="small" icon="el-icon-s-grid">
                                         预设布局 <i class="el-icon-arrow-down el-icon--right"></i>
@@ -889,7 +898,7 @@ export default {
                     heightPercent: Math.max(5, Math.min(100, heightPercent))
                 },
                 prompt,
-                zIndex: this.layoutBoxes.length + 1,
+                zIndex: Math.max(0, ...this.layoutBoxes.map(box => box.zIndex || 0)) + 1,
                 locked: false,
                 ...otherProps
             };
@@ -928,6 +937,23 @@ export default {
             this.selectedBoxId = boxId;
         },
         
+        // 图层顺序不改变角色标签或参考图的顺序。
+        orderedLayers() {
+            return [...this.layoutBoxes].sort((a, b) => a.zIndex - b.zIndex);
+        },
+        canMoveLayer(direction) {
+            const layers = this.orderedLayers();
+            const index = layers.findIndex(box => box.id === this.selectedBoxId);
+            return index >= 0 && index + direction >= 0 && index + direction < layers.length;
+        },
+        moveLayer(direction) {
+            if (!this.canMoveLayer(direction)) return;
+            const layers = this.orderedLayers();
+            const index = layers.findIndex(box => box.id === this.selectedBoxId);
+            [layers[index], layers[index + direction]] = [layers[index + direction], layers[index]];
+            layers.forEach((box, layerIndex) => { box.zIndex = layerIndex + 1; });
+        },
+
         // 获取布局框样式
         getBoxStyle(box) {
             return {
@@ -1213,10 +1239,10 @@ export default {
             this.resultImageUrl = null;
             
             try {
-                // 获取所有有 prompt 和角色图片的布局框（最多10个）
+                // 有角色图片的布局框都参与合成；未单独填写描述的角色也要保留。
                 const validBoxes = this.layoutBoxes
-                    .filter(box => box.prompt && box.prompt.trim() && box.characterImageUrl && box.characterImageUrl.trim())
-                    .slice(0, 10); // 最多10个
+                    .filter(box => box.characterImageUrl && box.characterImageUrl.trim())
+                    .map(box => ({ ...box, position: { ...box.position }, size: { ...box.size } })); // 固定本次提交的布局
                 
                 if (validBoxes.length === 0) {
                     ElMessage.warning(this.$t('createLayoutIllustration.fillPromptAndAddCharacter') || '请至少添加一个角色并填写prompt');
@@ -1224,16 +1250,24 @@ export default {
                     return;
                 }
                 
-                // 转换所有参考图
-                const referenceImagesBase64 = [];
+                if (validBoxes.length > 10) {
+                    ElMessage.warning(this.$t('createLayoutIllustration.tooManyLayoutCharacters'));
+                    return;
+                }
+
+                // 原图保留透明通道，用于绘制布局和角色参考图集。
+                const originalImagesBase64 = [];
+                const includedBoxes = [];
                 const conversionErrors = [];
                 
                 for (let i = 0; i < validBoxes.length; i++) {
                     const box = validBoxes[i];
                     try {
-                        const base64Image = await this.imageUrlToBase64(box.characterImageUrl, true);
-                        if (base64Image) {
-                            referenceImagesBase64.push(base64Image);
+                        // 合成布局必须使用原图，避免 JPEG 压缩丢失透明通道。
+                        const originalImage = await this.imageUrlToBase64(box.characterImageUrl, false);
+                        if (originalImage) {
+                            originalImagesBase64.push(originalImage);
+                            includedBoxes.push(box);
                         } else {
                             conversionErrors.push(box.label || `角色${box.id}`);
                         }
@@ -1242,7 +1276,7 @@ export default {
                     }
                 }
                 
-                if (referenceImagesBase64.length === 0) {
+                if (originalImagesBase64.length === 0) {
                     ElMessage.error(this.$t('createLayoutIllustration.allImagesConvertFailed') || '所有角色图片转换失败，请检查图片URL是否可访问');
                     this.processing = false;
                     return;
@@ -1257,27 +1291,20 @@ export default {
                     );
                 }
                 
-                // 构建合并的 prompt（明确"多角色同框"核心指令）
-                const mergedPrompt = this.buildMergedPrompt(validBoxes);
-                
-                // 重新计算当前画布尺寸（确保使用最新的宽高比）
                 const currentSize = this.calculateCanvasSize();
-                
+                const layoutReference = await this.createLayoutReference(includedBoxes, originalImagesBase64, currentSize);
+                const characterReference = await this.createCharacterReferenceSheet(originalImagesBase64);
+                const mergedPrompt = this.buildMergedPrompt(includedBoxes);
+
                 // 构建请求数据（使用 /create-character 接口格式）
                 const requestData = {
                     prompt: mergedPrompt, // 使用单个合并的 prompt（字符串）
                     size: `${currentSize.width}x${currentSize.height}` // 使用重新计算的尺寸
                 };
                 
-                // 设置 image 字段：支持单个Base64字符串或Base64字符串数组（最多10张）
-                if (referenceImagesBase64.length === 1) {
-                    // 单张图片：直接使用字符串
-                    requestData.image = referenceImagesBase64[0];
-                } else {
-                    // 多张图片：使用数组（最多10张）
-                    requestData.image = referenceImagesBase64.slice(0, 10);
-                }
-                
+                // 线上接口最多两张：第 1 张为布局，第 2 张为带编号的角色图集。
+                requestData.image = [layoutReference, characterReference];
+
                 const responseData = await postCreateCharacter(
                     this.$http,
                     requestData,
@@ -1395,18 +1422,81 @@ export default {
             return `${positionDesc}，${sizeDesc}`;
         },
         
-        // 构建合并的 prompt（明确"多角色同框"核心指令）
+        // 绘制图片，使用与画布预览相同的 contain 居中方式。
+        drawContainedImage(ctx, img, x, y, width, height) {
+            const scale = Math.min(width / img.naturalWidth, height / img.naturalHeight);
+            const drawWidth = img.naturalWidth * scale;
+            const drawHeight = img.naturalHeight * scale;
+            ctx.drawImage(img, x + (width - drawWidth) / 2, y + (height - drawHeight) / 2, drawWidth, drawHeight);
+        },
+        loadReferenceImage(src) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = () => reject(new Error(this.$t('createLayoutIllustration.layoutReferenceFailed')));
+                img.src = src;
+            });
+        },
+        async createLayoutReference(boxes, originals, size) {
+            const images = await Promise.all(originals.map(src => this.loadReferenceImage(src)));
+            const canvas = document.createElement('canvas');
+            canvas.width = size.width;
+            canvas.height = size.height;
+            const ctx = canvas.getContext('2d');
+            // 白底仅用于布局参考；最终背景仍由用户提示词决定。
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            boxes.map((box, index) => ({ box, image: images[index] }))
+                .sort((a, b) => a.box.zIndex - b.box.zIndex)
+                .forEach(({ box, image }) => {
+                    this.drawContainedImage(ctx, image,
+                        canvas.width * box.position.xPercent / 100,
+                        canvas.height * box.position.yPercent / 100,
+                        canvas.width * box.size.widthPercent / 100,
+                        canvas.height * box.size.heightPercent / 100);
+                });
+            return canvas.toDataURL('image/png');
+        },
+        async createCharacterReferenceSheet(originals) {
+            const images = await Promise.all(originals.map(src => this.loadReferenceImage(src)));
+            const columns = Math.min(images.length, images.length > 6 ? 4 : 3);
+            const cellWidth = 450;
+            const cellHeight = 520;
+            const canvas = document.createElement('canvas');
+            canvas.width = columns * cellWidth;
+            canvas.height = Math.ceil(images.length / columns) * cellHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = 'bold 38px sans-serif';
+            ctx.textAlign = 'center';
+            images.forEach((image, index) => {
+                const x = (index % columns) * cellWidth;
+                const y = Math.floor(index / columns) * cellHeight;
+                ctx.strokeStyle = '#d4d8df';
+                ctx.strokeRect(x + 1, y + 1, cellWidth - 2, cellHeight - 2);
+                ctx.fillStyle = '#111';
+                ctx.fillText(String(index + 1), x + cellWidth / 2, y + 48);
+                this.drawContainedImage(ctx, image, x + 18, y + 62, cellWidth - 36, cellHeight - 80);
+            });
+            return canvas.toDataURL('image/jpeg', 0.92);
+        },
+        characterReferenceDescription(index) {
+            return `第2张角色参考图集中的编号${index + 1}`;
+        },
+
+        // 第 1 张图片是布局参考，第 2 张是带编号的角色形象图集。
         buildMergedPrompt(validBoxes) {
             const characterCount = validBoxes.length;
             
             // 1. 核心指令：明确"多角色同框"
-            let mergedPrompt = '';
+            let mergedPrompt = '第1张图片是布局参考图：请严格参考其中角色的位置、相对大小、前后遮挡和画布构图；图中的白色背景仅作布局底色，不代表最终背景。第2张图片是角色形象参考图集：按格子上的编号识别不同角色，仅用于保持各角色的外貌、服装和风格，不要照搬图集的背景、格子、编号或排列，也不要在最终画面中出现编号。在保留布局和角色身份的基础上，根据场景要求自然融合光影与画风。';
             if (characterCount === 1) {
-                mergedPrompt = '创作单一插画角色，完整呈现角色形象。';
+                mergedPrompt += '创作单一插画角色，完整呈现角色形象。';
             } else if (characterCount === 2) {
-                mergedPrompt = '同时包含两个角色，两个角色必须同时出现在画面中，无缺失，双角色同框。';
+                mergedPrompt += '同时包含两个角色，两个角色必须同时出现在画面中，无缺失，双角色同框。';
             } else {
-                mergedPrompt = `同时包含${characterCount}个角色，所有角色必须同时出现在画面中，无缺失，多角色同框。`;
+                mergedPrompt += `同时包含${characterCount}个角色，所有角色必须同时出现在画面中，无缺失，多角色同框。`;
             }
             
             // 2. 计算所有角色的面积，用于相对尺寸比较
@@ -1428,8 +1518,8 @@ export default {
                 const layoutDesc = this.getLayoutDescription(box);
                 const characterLabel = box.label || `角色${box.id}`;
                 
-                // 明确绑定参考图编号（从1开始）
-                const referenceImageIndex = i + 1;
+                // 将角色绑定到图集中对应的编号。
+                const referenceImageDescription = this.characterReferenceDescription(i);
                 
                 // 计算相对尺寸排名
                 const areaRank = characterAreas.findIndex(a => a.id === box.id) + 1;
@@ -1439,13 +1529,7 @@ export default {
                 
                 let characterDesc = '';
                 
-                if (characterCount === 1) {
-                    // 单个角色，不需要强调参考图绑定
-                    characterDesc = `${box.prompt.trim()}，${layoutDesc}`;
-                } else {
-                    // 多个角色，明确绑定参考图，并强调尺寸
-                    characterDesc = `基于参考图${referenceImageIndex}生成${characterLabel}：${box.prompt.trim()}，${layoutDesc}${relativeSizeDesc}。请严格按照指定的尺寸比例生成该角色`;
-                }
+                characterDesc = `基于角色形象${referenceImageDescription}生成${characterLabel}：${(box.prompt || '').trim() || '保持角色原有形象'}，${layoutDesc}${relativeSizeDesc}。请严格按照布局参考图的尺寸比例生成该角色`;
                 
                 characterDescriptions.push(characterDesc);
             }
@@ -1455,8 +1539,15 @@ export default {
                 mergedPrompt += ' ' + characterDescriptions.join(' ');
             }
             
-            // 5. 添加构图约束，特别强调尺寸准确性
-            mergedPrompt += ' 画面构图要合理，所有角色都要完整呈现，不要遮挡，不要缺失任何角色。每个角色的尺寸必须严格按照上述描述的比例生成，不得随意改变大小。';
+            // 图层顺序通过文字告知生图模型；参考图编号仍保持原来的顺序。
+            if (characterCount > 1) {
+                const layerOrder = [...validBoxes]
+                    .sort((a, b) => a.zIndex - b.zIndex)
+                    .map(box => `${this.characterReferenceDescription(validBoxes.indexOf(box))}对应的角色`)
+                    .join('、');
+                mergedPrompt += ` 角色前后层次从后到前依次为：${layerOrder}。重叠时按此顺序遮挡，尽量保持每个角色清晰可辨。`;
+            }
+            mergedPrompt += ' 画面构图要合理，不要缺失任何角色。每个角色的尺寸必须严格按照上述描述的比例生成，不得随意改变大小。';
             
             // 5. 添加背景提示词（如果有）
             if (this.backgroundPrompt && this.backgroundPrompt.trim()) {
@@ -1600,6 +1691,8 @@ export default {
                         canvas.width = width;
                         canvas.height = height;
                         const ctx = canvas.getContext('2d');
+                        ctx.fillStyle = '#fff';
+                        ctx.fillRect(0, 0, width, height);
                         ctx.drawImage(img, 0, 0, width, height);
                         
                         canvas.toBlob((blob) => {
@@ -1726,7 +1819,7 @@ export default {
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                         
-                        const dataUrl = canvas.toDataURL('image/jpeg', compress ? 0.7 : 1.0);
+                        const dataUrl = compress ? canvas.toDataURL('image/jpeg', 0.7) : canvas.toDataURL('image/png');
                         resolve(dataUrl);
                     } catch (error) {
                         reject(new Error('Canvas转换失败: ' + error.message));
@@ -2280,7 +2373,7 @@ export default {
 }
 
 .layout-box.has-image {
-    background: rgba(245, 245, 245, 0.95);
+    background: transparent;
 }
 
 .layout-box-preview {
@@ -2294,10 +2387,8 @@ export default {
 }
 
 .layout-box-preview img {
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
     display: block;
 }
