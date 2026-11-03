@@ -135,9 +135,11 @@
                         <!-- 画布区域 -->
                         <div 
                             class="layout-canvas-wrapper"
+                            ref="canvasWrapper"
                             @click="handleCanvasClick"
                             @mousemove="handleMouseMove"
                             @mouseup="handleMouseUp">
+                            <div class="layout-canvas-stage" :style="canvasStageStyle">
                             <div 
                                 class="layout-canvas-container"
                                 :style="canvasContainerStyle">
@@ -195,7 +197,8 @@
                                             :key="handle"
                                             class="resize-handle"
                                             :class="'handle-' + handle"
-                                            @mousedown.stop="handleResizeStart(box.id, handle, $event)">
+                                            :style="{ '--handle-size': (14 / canvasScale) + 'px' }"
+                                            @pointerdown.stop.prevent="handleResizeStart(box.id, handle, $event)">
                                         </div>
                                     </template>
                                     
@@ -205,6 +208,7 @@
                                     </div>
                                 </div>
                                 </div>
+                            </div>
                             </div>
                         </div>
                     </div>
@@ -437,6 +441,8 @@ export default {
             // 画布尺寸（默认 3:4 比例，使用 1280 作为高度基准）
             canvasWidth: 960, // 默认 3:4 比例 (1280 * 3/4 = 960)
             canvasHeight: 1280,
+            canvasViewport: { width: 800, height: 600 },
+            canvasResizeObserver: null,
             
             // 选中的布局框ID
             selectedBoxId: null,
@@ -481,13 +487,17 @@ export default {
         },
         // 计算画布缩放比例（用于鼠标事件计算）
         canvasScale() {
-            const actualWidth = this.canvasWidth;
-            const actualHeight = this.canvasHeight;
-            const maxDisplayWidth = 800;
-            const maxDisplayHeight = 600;
-            const scaleX = maxDisplayWidth / actualWidth;
-            const scaleY = maxDisplayHeight / actualHeight;
-            return Math.min(scaleX, scaleY, 1);
+            return Math.min(
+                this.canvasViewport.width / this.canvasWidth,
+                this.canvasViewport.height / this.canvasHeight,
+                1.5
+            );
+        },
+        canvasStageStyle() {
+            return {
+                width: `${this.canvasWidth * this.canvasScale}px`,
+                height: `${this.canvasHeight * this.canvasScale}px`
+            };
         },
         // 计算画布容器的缩放比例
         canvasContainerStyle() {
@@ -500,11 +510,11 @@ export default {
             
             return {
                 transform: `scale(${scale})`,
-                transformOrigin: 'top center',
+                transformOrigin: 'top left',
                 width: actualWidth + 'px',
                 height: actualHeight + 'px',
                 position: 'relative',
-                margin: '0 auto'
+                margin: '0'
             };
         },
         canvasStyle() {
@@ -530,6 +540,17 @@ export default {
     },
     mounted() {
         this.loadCharacters();
+        const updateCanvasViewport = () => {
+            const wrapper = this.$refs.canvasWrapper;
+            if (!wrapper) return;
+            const style = window.getComputedStyle(wrapper);
+            const width = wrapper.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+            const height = wrapper.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
+            if (width > 0 && height > 0) this.canvasViewport = { width, height };
+        };
+        this.canvasResizeObserver = new ResizeObserver(updateCanvasViewport);
+        this.canvasResizeObserver.observe(this.$refs.canvasWrapper);
+        updateCanvasViewport();
         // 延迟设置拖拽监听，确保画布已渲染
         setTimeout(() => {
             this.setupCanvasDropListeners();
@@ -544,6 +565,9 @@ export default {
     beforeUnmount() {
         // 清理事件监听
         this.removeCanvasDropListeners();
+        if (this.canvasResizeObserver) this.canvasResizeObserver.disconnect();
+        this.handleDragEnd();
+        this.handleResizeEnd();
     },
     methods: {
         // 加载角色列表
@@ -979,6 +1003,8 @@ export default {
             const box = this.layoutBoxes.find(b => b.id === boxId);
             if (!box || box.locked) return;
             
+            if (event.button !== 0) return;
+            this.selectedBoxId = boxId;
             this.isResizing = true;
             this.resizeHandle = handle;
             this.resizeStartSize = {
@@ -993,8 +1019,9 @@ export default {
                 y: event.clientY
             };
             
-            document.addEventListener('mousemove', this.handleResizeMove);
-            document.addEventListener('mouseup', this.handleResizeEnd);
+            document.addEventListener('pointermove', this.handleResizeMove);
+            document.addEventListener('pointerup', this.handleResizeEnd);
+            document.addEventListener('pointercancel', this.handleResizeEnd);
         },
         
         // 调整大小移动
@@ -1004,31 +1031,27 @@ export default {
             const box = this.layoutBoxes.find(b => b.id === this.selectedBoxId);
             if (!box || box.locked) return;
             
-            const deltaX = (event.clientX - this.dragStartPos.x) / this.internalCanvasWidth * 100;
-            const deltaY = (event.clientY - this.dragStartPos.y) / this.internalCanvasHeight * 100;
-            
+            const rect = this.$refs.canvasRef.getBoundingClientRect();
+            const deltaX = (event.clientX - this.dragStartPos.x) / rect.width * 100;
+            const deltaY = (event.clientY - this.dragStartPos.y) / rect.height * 100;
+            const start = this.resizeStartSize;
+            const right = start.x + start.width;
+            const bottom = start.y + start.height;
+            const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+
             if (this.resizeHandle.includes('w')) {
-                box.position.xPercent = Math.max(0, this.resizeStartSize.x + deltaX);
-                box.size.widthPercent = Math.max(5, this.resizeStartSize.width - deltaX);
-            }
-            if (this.resizeHandle.includes('e')) {
-                box.size.widthPercent = Math.max(5, this.resizeStartSize.width + deltaX);
+                box.position.xPercent = clamp(start.x + deltaX, 0, right - 5);
+                box.size.widthPercent = right - box.position.xPercent;
+            } else if (this.resizeHandle.includes('e')) {
+                box.size.widthPercent = clamp(start.width + deltaX, 5, 100 - start.x);
             }
             if (this.resizeHandle.includes('n')) {
-                box.position.yPercent = Math.max(0, this.resizeStartSize.y + deltaY);
-                box.size.heightPercent = Math.max(5, this.resizeStartSize.height - deltaY);
+                box.position.yPercent = clamp(start.y + deltaY, 0, bottom - 5);
+                box.size.heightPercent = bottom - box.position.yPercent;
+            } else if (this.resizeHandle.includes('s')) {
+                box.size.heightPercent = clamp(start.height + deltaY, 5, 100 - start.y);
             }
-            if (this.resizeHandle.includes('s')) {
-                box.size.heightPercent = Math.max(5, this.resizeStartSize.height + deltaY);
-            }
-            
-            if (box.position.xPercent + box.size.widthPercent > 100) {
-                box.size.widthPercent = 100 - box.position.xPercent;
-            }
-            if (box.position.yPercent + box.size.heightPercent > 100) {
-                box.size.heightPercent = 100 - box.position.yPercent;
-            }
-            
+
             box.position.x = (box.position.xPercent / 100) * this.internalCanvasWidth;
             box.position.y = (box.position.yPercent / 100) * this.internalCanvasHeight;
             box.size.width = (box.size.widthPercent / 100) * this.internalCanvasWidth;
@@ -1039,8 +1062,9 @@ export default {
         handleResizeEnd() {
             this.isResizing = false;
             this.resizeHandle = null;
-            document.removeEventListener('mousemove', this.handleResizeMove);
-            document.removeEventListener('mouseup', this.handleResizeEnd);
+            document.removeEventListener('pointermove', this.handleResizeMove);
+            document.removeEventListener('pointerup', this.handleResizeEnd);
+            document.removeEventListener('pointercancel', this.handleResizeEnd);
         },
         
         // 切换网格
@@ -2175,7 +2199,8 @@ export default {
 .layout-toolbar {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
     padding: 12px;
     background: #f5f7fa;
     border-radius: 8px;
@@ -2189,24 +2214,29 @@ export default {
 
 .layout-canvas-wrapper {
     position: relative;
-    overflow: hidden; /* 改为 hidden，避免滚动条 */
-    background: #fff;
+    overflow: hidden;
+    box-sizing: border-box;
+    background: #f2f4f7;
     border-radius: 8px;
     padding: 20px;
     display: flex;
-    align-items: flex-start; /* 改为 flex-start，从顶部开始 */
+    align-items: center;
     justify-content: center;
     flex: 1;
     min-height: 0;
     width: 100%;
 }
 
+.layout-canvas-stage {
+    flex: none;
+}
+
 .layout-canvas-container {
-    /* 容器用于缩放画布，样式通过 :style 动态设置 */
-    display: inline-block;
+    display: block;
 }
 
 .layout-canvas {
+    box-shadow: 0 4px 18px rgba(31, 41, 55, 0.12);
     position: relative;
     background: #fafafa;
     border: 2px dashed #dcdfe6;
@@ -2246,7 +2276,7 @@ export default {
     cursor: move;
     box-sizing: border-box;
     transition: border-color 0.2s;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .layout-box.has-image {
@@ -2303,22 +2333,24 @@ export default {
 .resize-handle {
     position: absolute;
     z-index: 3;
-    width: 8px;
-    height: 8px;
+    width: var(--handle-size);
+    height: var(--handle-size);
+    box-sizing: border-box;
+    touch-action: none;
     background: #67c23a;
     border: 2px solid #fff;
     border-radius: 50%;
     cursor: nwse-resize;
 }
 
-.handle-nw { top: -4px; left: -4px; cursor: nw-resize; }
-.handle-ne { top: -4px; right: -4px; cursor: ne-resize; }
-.handle-sw { bottom: -4px; left: -4px; cursor: sw-resize; }
-.handle-se { bottom: -4px; right: -4px; cursor: se-resize; }
-.handle-n { top: -4px; left: 50%; transform: translateX(-50%); cursor: n-resize; }
-.handle-s { bottom: -4px; left: 50%; transform: translateX(-50%); cursor: s-resize; }
-.handle-w { top: 50%; left: -4px; transform: translateY(-50%); cursor: w-resize; }
-.handle-e { top: 50%; right: -4px; transform: translateY(-50%); cursor: e-resize; }
+.handle-nw { top: calc(var(--handle-size) / -2); left: calc(var(--handle-size) / -2); cursor: nw-resize; }
+.handle-ne { top: calc(var(--handle-size) / -2); right: calc(var(--handle-size) / -2); cursor: ne-resize; }
+.handle-sw { bottom: calc(var(--handle-size) / -2); left: calc(var(--handle-size) / -2); cursor: sw-resize; }
+.handle-se { bottom: calc(var(--handle-size) / -2); right: calc(var(--handle-size) / -2); cursor: se-resize; }
+.handle-n { top: calc(var(--handle-size) / -2); left: 50%; transform: translateX(-50%); cursor: n-resize; }
+.handle-s { bottom: calc(var(--handle-size) / -2); left: 50%; transform: translateX(-50%); cursor: s-resize; }
+.handle-w { top: 50%; left: calc(var(--handle-size) / -2); transform: translateY(-50%); cursor: w-resize; }
+.handle-e { top: 50%; right: calc(var(--handle-size) / -2); transform: translateY(-50%); cursor: e-resize; }
 
 .lock-icon {
     position: absolute;
@@ -2327,6 +2359,26 @@ export default {
     z-index: 2;
     color: #909399;
     font-size: 16px;
+}
+@media (max-width: 1100px) {
+    .container { height: auto; min-height: calc(100vh - 90px); }
+    .main-layout { flex-wrap: wrap; }
+    .left-panel { flex: 0 0 220px; }
+    .center-panel { flex: 1 1 500px; min-height: 650px; }
+    .right-panel { flex: 1 1 100%; flex-direction: row; }
+    .right-panel > .panel-card { flex: 1; min-width: 0; }
+}
+
+@media (max-width: 700px) {
+    .container { padding: 12px; }
+    .main-layout { gap: 12px; }
+    .left-panel, .center-panel, .right-panel { flex: 1 1 100%; }
+    .left-panel .characters-list { max-height: 220px; }
+    .characters-grid { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); }
+    .center-panel { min-height: 520px; }
+    .right-panel { flex-direction: column; }
+    .layout-canvas-wrapper { padding: 12px; }
+    .toolbar-info { margin-left: 0; }
 }
 </style>
 
