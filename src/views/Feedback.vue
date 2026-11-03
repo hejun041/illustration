@@ -25,7 +25,7 @@
         <div v-if="reviewHasMore || reviewPage > 1" class="pagination"><button type="button" :disabled="reviewPage <= 1" @click="changeReviewPage(reviewPage - 1)">{{ $t('feedback.previous') }}</button><span>{{ reviewPage }}</span><button type="button" :disabled="!reviewHasMore" @click="changeReviewPage(reviewPage + 1)">{{ $t('feedback.next') }}</button></div>
       </section>
       <div class="feedback-layout">
-        <section class="board panel" aria-labelledby="board-title">
+        <section class="board" aria-labelledby="board-title">
           <div class="panel-heading board-heading">
             <div><h2 id="board-title">{{ $t('feedback.boardTitle') }}</h2><p>{{ $t('feedback.boardSubtitle') }}</p></div>
           </div>
@@ -123,14 +123,16 @@ export default {
 .feedback-layout { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(320px, 1fr); gap: 28px; align-items: start; }
 .panel { overflow: hidden; border: 2px solid #291c16; border-radius: 24px; background: #fff9f1; box-shadow: 5px 5px 0 #291c16; }
 .panel-heading { padding: 28px 30px 20px; }
+.board-heading { padding: 4px 2px 20px; }
+.form-panel { background: #e8f6f4; }
 .panel-heading h2 { margin: 0; color: #291c16; font-size: 22px; line-height: 1.35; }
 .panel-heading p { margin: 7px 0 0; color: #76665e; font-size: 14px; line-height: 1.6; }
-.board-body { min-height: 330px; padding: 0 30px 30px; }
-.board-state { min-height: 300px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #76665e; line-height: 1.7; text-align: center; }
+.board-body { min-height: 0; padding: 0 5px 5px 0; }
+.board-state { min-height: 290px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-sizing: border-box; padding: 28px; border: 2px solid #291c16; border-radius: 24px; background: #f2ebfb; box-shadow: 5px 5px 0 #291c16; color: #655b65; line-height: 1.7; text-align: center; }
 .board-state p { margin: 8px 0; }
 .board-state h3 { margin: 0; color: #291c16; font-size: 17px; }
-.feedback-thread { padding: 20px 0; border-top: 1px solid #e7dcd2; }
-.feedback-thread + .feedback-thread { margin-top: 0; }
+.feedback-thread { padding: 24px; border: 2px solid #291c16; border-radius: 22px; background: #f2ebfb; box-shadow: 5px 5px 0 #291c16; }
+.feedback-thread + .feedback-thread { margin-top: 20px; }
 .thread-meta,.reply-title { display: flex; align-items: center; gap: 9px; color: #45352e; font-size: 14px; }
 .thread-meta time,.reply-title time { margin-left: auto; color: #8a7a71; font-size: 12px; }
 .avatar { display: grid; flex: none; place-items: center; width: 30px; height: 30px; border: 1px solid #291c16; border-radius: 50%; font-size: 12px; font-weight: 700; }
@@ -138,7 +140,7 @@ export default {
 .team-avatar { background: #b9e4f2; color: #254d5e; }
 .thread-content,.reply p { overflow-wrap: anywhere; white-space: pre-wrap; font-size: 14px; line-height: 1.8; }
 .thread-content { margin: 14px 0 0; color: #453a35; }
-.reply { margin-top: 16px; padding: 15px 16px; border: 1px solid #e6d8cb; border-radius: 14px; background: #fff; }
+.reply { margin-top: 16px; padding: 15px 16px; border: 1px solid #d4c8e2; border-radius: 14px; background: #fff; }
 .reply p { margin: 10px 0 0 39px; color: #675951; }
 .form-body { padding: 0 30px 30px; }
 .field-label { display: block; margin-bottom: 10px; color: #45352e; font-size: 15px; font-weight: 700; }
@@ -180,7 +182,9 @@ export default {
   .feedback-layout { grid-template-columns: 1fr; gap: 22px; }
   .form-panel { order: -1; }
   .panel-heading { padding: 23px 22px 17px; }
-  .board-body { padding: 0 22px 22px; }
+  .board-heading { padding: 2px 2px 17px; }
+  .board-body { padding: 0 5px 5px 0; }
+  .feedback-thread { padding: 20px; }
   .form-body { padding: 0 22px 26px; }
   .review-panel { padding: 22px; }
 }
