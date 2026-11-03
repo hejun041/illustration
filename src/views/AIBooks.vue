@@ -91,10 +91,27 @@
                         <p class="progress-text">{{ progressText }}</p>
                     </div>
 
+                    <div v-if="!generating && imagePrompts && imagePrompts.length && storyData?.title" class="story-result-title">
+                        <span class="story-result-icon" aria-hidden="true">✦</span>
+                        <strong>{{ storyData.title }}</strong>
+                    </div>
                     <!-- 角色设定卡 -->
                     <div v-if="!generating && imagePrompts && imagePrompts.length > 0" class="character-card-editor">
                         <h3 class="prompts-title">{{ $t('aibooks.characterCard') }}</h3>
                         <p class="character-card-hint">{{ $t('aibooks.characterCardHint') }}</p>
+                        <div v-if="displayCharacterProfiles.length" class="character-profile-list">
+                            <article v-for="(profile, index) in displayCharacterProfiles" :key="index" class="character-profile">
+                                <span class="character-avatar" :class="{ supporting: index > 0 }" aria-hidden="true">{{ profile.name.slice(0, 1) }}</span>
+                                <div class="character-profile-content">
+                                    <strong>{{ profile.name }}</strong>
+                                    <div class="character-tags">
+                                        <span v-for="(trait, traitIndex) in characterTraits(profile)" :key="traitIndex" class="character-tag">{{ trait }}</span>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                        <details class="character-edit-details" :open="!displayCharacterProfiles.length">
+                            <summary>{{ $i18n.locale === 'en' ? 'Edit character descriptions' : '编辑角色设定' }}</summary>
                         <el-input
                             v-model="characterCard"
                             type="textarea"
@@ -102,6 +119,7 @@
                             :placeholder="$t('aibooks.characterCardPlaceholder')"
                             class="character-card-textarea"
                         />
+                        </details>
                         <p class="character-ref-section-title">{{ $t('aibooks.characterRefOptional') }}</p>
                         <p class="character-ref-section-hint">{{ $t('aibooks.protagonistRefHint') }}</p>
                         <div
@@ -177,10 +195,16 @@
                                         @click="removeImagePrompt(index)"
                                     >{{ $t('aibooks.deletePrompt') }}</el-button>
                                 </div>
+                                <div v-if="storyData?.scenes?.[promptSceneIndexes[index] ?? index]" class="scene-narration">
+                                    <span class="scene-field-label">{{ $i18n.locale === 'en' ? 'Narration' : '画面旁白' }}</span>
+                                    {{ storyData.scenes[promptSceneIndexes[index] ?? index] }}
+                                </div>
+                                <label class="scene-field-label" :for="'scene-prompt-' + (promptSceneIndexes[index] ?? index)">{{ $i18n.locale === 'en' ? 'Scene description' : '画面描述' }}</label>
                                 <el-input
+                                    :id="'scene-prompt-' + (promptSceneIndexes[index] ?? index)"
                                     v-model="imagePrompts[index]"
                                     type="textarea"
-                                    :autosize="{ minRows: 6, maxRows: 18 }"
+                                    :autosize="{ minRows: 3, maxRows: 18 }"
                                     resize="vertical"
                                     :disabled="generatingImages"
                                     :placeholder="$t('aibooks.page', { page: (promptSceneIndexes[index] ?? index) + 1 }) + ' ' + $t('aibooks.promptPlaceholder')"
@@ -437,6 +461,9 @@ export default {
         }
     },
     computed: {
+        displayCharacterProfiles() {
+            return parseCharacterCardText(this.characterCard)
+        },
         selectedHandrawStyle() {
             const style = this.styles.find(s => s.key === this.form.artStyle)
             return isHandrawLibraryStyle(style) ? style : null
@@ -488,6 +515,11 @@ export default {
         }
     },
     methods: {
+        characterTraits(profile) {
+            return [profile.appearance, profile.personality]
+                .filter(Boolean)
+                .flatMap(value => value.split(/[，,；;。\n]+/).map(part => part.trim()).filter(Boolean))
+        },
         async notifyApiError(error, fallbackMessage) {
             if (error?.insufficientPoints) {
                 return true
@@ -1717,13 +1749,65 @@ export default {
     line-height: 1.4;
 }
 
-.character-card-editor {
-    margin-top: 20px;
+.story-result-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 24px;
     padding: 14px;
-    border-radius: 10px;
-    background: #f8f9fc;
-    border: 1px solid #ebeef5;
+    border-radius: 12px;
+    background: linear-gradient(110deg, #eaf2ff, #fbeef6);
+    color: #30354a;
+    font-size: 17px;
+    overflow-wrap: anywhere;
 }
+.story-result-icon {
+    display: grid;
+    flex: 0 0 40px;
+    height: 40px;
+    place-items: center;
+    border-radius: 10px;
+    background: #386af4;
+    color: white;
+}
+.character-card-editor {
+    margin-top: 24px;
+}
+.character-profile-list { display: grid; gap: 10px; margin: 14px 0; }
+.character-profile {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid #edf0f7;
+    border-radius: 10px;
+    background: #fff;
+}
+.character-avatar {
+    display: grid;
+    flex: 0 0 38px;
+    height: 38px;
+    place-items: center;
+    border-radius: 50%;
+    background: #eb63c7;
+    color: #fff;
+    font-weight: 600;
+}
+.character-avatar.supporting { background: #efa94e; }
+.character-profile-content { min-width: 0; color: #303133; }
+.character-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.character-tag {
+    max-width: 100%;
+    padding: 5px 9px;
+    border-radius: 4px;
+    background: #f2f3f7;
+    color: #536079;
+    font-size: 13px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+.character-edit-details summary { cursor: pointer; color: #5268bc; font-size: 13px; padding: 8px 0; }
+.character-edit-details summary:focus-visible { outline: 2px solid #386af4; outline-offset: 2px; }
 
 .character-card-hint,
 .consistency-hint {
@@ -1830,15 +1914,37 @@ export default {
 .prompts-list {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 0;
     margin-bottom: 20px;
+    padding: 16px 16px 4px 26px;
+    border: 1px solid #edf0f7;
+    border-radius: 10px;
+    background: #fff;
 }
 
 .prompt-item {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: 8px;
+    padding: 0 0 22px 18px;
+    border-left: 1px solid #e6e2f2;
 }
+.prompt-item:last-child { border-left-color: transparent; }
+.prompt-item::before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: -6px;
+    width: 10px;
+    height: 10px;
+    border: 1px solid #a75cff;
+    border-radius: 50%;
+    background: #fff;
+}
+.scene-narration { padding: 10px 12px; border-radius: 8px; background: #edf1ff; color: #465575; font-size: 13px; line-height: 1.7; overflow-wrap: anywhere; }
+.scene-field-label { color: #536079; font-size: 13px; font-weight: 600; }
+.scene-narration .scene-field-label { margin-right: 5px; }
 
 .prompt-item-header {
     display: flex;
