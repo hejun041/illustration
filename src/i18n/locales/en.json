@@ -1553,6 +1553,7 @@
     "pointsHint": "Generating one image costs 2 points",
     "generatingWait": "Generating, please wait...",
     "resultPlaceholder": "Generated result will be displayed here",
+    "collectIllustration": "Save illustration",
     "save": "Save",
     "download": "Download",
     "pleaseLogin": "Please login first",

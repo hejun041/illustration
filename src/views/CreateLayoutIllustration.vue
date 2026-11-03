@@ -383,30 +383,31 @@
 
                         <!-- 生成结果 -->
                         <div v-else-if="resultImageUrl" class="result-image">
+                            <div class="result-actions">
+                                <el-button
+                                    type="primary"
+                                    size="small"
+                                    @click="handleSave">
+                                    <i class="el-icon-check"></i> {{ $t('createLayoutIllustration.collectIllustration') }}
+                                </el-button>
+                                <el-button
+                                    size="small"
+                                    @click="handleDownload">
+                                    <i class="el-icon-download"></i> {{ $t('createLayoutIllustration.download') }}
+                                </el-button>
+                            </div>
                             <el-image
                                 :src="resultImageUrl"
                                 fit="contain"
                                 class="generated-image"
-                                :preview-src-list="[resultImageUrl]">
+                                :preview-src-list="[resultImageUrl]"
+                                :preview-teleported="true">
                                 <template #error>
                                     <div class="image-slot">
                                         <i class="el-icon-picture-outline"></i>
                                     </div>
                                 </template>
                             </el-image>
-                            <div class="result-actions">
-                                <el-button 
-                                    type="primary" 
-                                    size="small"
-                                    @click="handleSave">
-                                    <i class="el-icon-check"></i> {{ $t('createLayoutIllustration.save') }}
-                                </el-button>
-                                <el-button 
-                                    size="small"
-                                    @click="handleDownload">
-                                    <i class="el-icon-download"></i> {{ $t('createLayoutIllustration.download') }}
-                                </el-button>
-                            </div>
                         </div>
 
                         <!-- 空状态 -->
@@ -452,6 +453,7 @@ export default {
             canvasHeight: 1280,
             canvasViewport: { width: 800, height: 600 },
             canvasResizeObserver: null,
+            canvasResizeFrame: null,
             
             // 选中的布局框ID
             selectedBoxId: null,
@@ -555,9 +557,15 @@ export default {
             const style = window.getComputedStyle(wrapper);
             const width = wrapper.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
             const height = wrapper.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
-            if (width > 0 && height > 0) this.canvasViewport = { width, height };
+            if (width > 0 && height > 0 &&
+                (width !== this.canvasViewport.width || height !== this.canvasViewport.height)) {
+                this.canvasViewport = { width, height };
+            }
         };
-        this.canvasResizeObserver = new ResizeObserver(updateCanvasViewport);
+        this.canvasResizeObserver = new ResizeObserver(() => {
+            cancelAnimationFrame(this.canvasResizeFrame);
+            this.canvasResizeFrame = requestAnimationFrame(updateCanvasViewport);
+        });
         this.canvasResizeObserver.observe(this.$refs.canvasWrapper);
         updateCanvasViewport();
         // 延迟设置拖拽监听，确保画布已渲染
@@ -575,6 +583,7 @@ export default {
         // 清理事件监听
         this.removeCanvasDropListeners();
         if (this.canvasResizeObserver) this.canvasResizeObserver.disconnect();
+        cancelAnimationFrame(this.canvasResizeFrame);
         this.handleDragEnd();
         this.handleResizeEnd();
     },
@@ -1867,6 +1876,14 @@ export default {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.right-panel > .panel-card {
+    height: auto;
+    flex: 1 1 0;
+    min-height: 320px;
 }
 
 .panel-card {
@@ -2163,9 +2180,8 @@ export default {
 }
 
 /* 结果区域 */
-.result-card {
-    flex: 1;
-    min-height: 400px;
+.right-panel > .result-card {
+    min-height: 340px;
 }
 
 .result-content {
@@ -2231,17 +2247,23 @@ export default {
 .generated-image {
     flex: 1;
     width: 100%;
-    min-height: 300px;
+    min-height: 0;
     border-radius: 8px;
     overflow: hidden;
     background: #f5f7fa;
 }
 
 .result-actions {
-    margin-top: 16px;
+    flex: none;
     display: flex;
     gap: 12px;
-    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.result-actions :deep(.el-button) {
+    flex: 1;
+    min-width: 0;
+    margin-left: 0;
 }
 
 @keyframes rotating {
@@ -2456,7 +2478,7 @@ export default {
     .main-layout { flex-wrap: wrap; }
     .left-panel { flex: 0 0 220px; }
     .center-panel { flex: 1 1 500px; min-height: 650px; }
-    .right-panel { flex: 1 1 100%; flex-direction: row; }
+    .right-panel { flex: 1 1 100%; flex-direction: row; overflow-y: visible; }
     .right-panel > .panel-card { flex: 1; min-width: 0; }
 }
 
@@ -2468,6 +2490,8 @@ export default {
     .characters-grid { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); }
     .center-panel { min-height: 520px; }
     .right-panel { flex-direction: column; }
+    .right-panel > .panel-card { flex: none; }
+    .right-panel > .result-card { height: 430px; }
     .layout-canvas-wrapper { padding: 12px; }
     .toolbar-info { margin-left: 0; }
 }

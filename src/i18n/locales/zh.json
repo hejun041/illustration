@@ -1568,6 +1568,7 @@
     "pointsHint": "生成一张图片需消耗2积分",
     "generatingWait": "正在生成中，请稍候...",
     "resultPlaceholder": "生成的结果将显示在这里",
+    "collectIllustration": "收集插画",
     "save": "保存",
     "download": "下载",
     "pleaseLogin": "请先登录",
