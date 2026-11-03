@@ -1,6 +1,25 @@
 <template>
   <main class="feedback-page">
     <div class="feedback-wrap">
+        <section class="board"  :aria-label="$t('feedback.boardTitle')">
+          <div class="board-body" aria-live="polite">
+            <div v-if="loading" class="board-state">{{ $t('feedback.loading') }}</div>
+            <div v-else-if="loadError" class="board-state"><p>{{ $t('feedback.loadFailed') }}</p><button type="button" class="text-button" @click="loadFeedback">{{ $t('feedback.retry') }}</button></div>
+            <div v-else-if="!items.length" class="board-state empty-state">
+              <h3>{{ $t('feedback.emptyTitle') }}</h3><p>{{ $t('feedback.emptyDescription') }}</p>
+            </div>
+            <template v-else>
+              <article v-for="item in items" :key="item.id" class="feedback-thread">
+                <div class="thread-meta"><span class="avatar user-avatar" aria-hidden="true">{{ $t('feedback.userInitial') }}</span><strong>{{ $t('feedback.anonymousUser') }}</strong><time v-if="item.created_at" :datetime="item.created_at">{{ formatDate(item.created_at) }}</time></div>
+                <p class="thread-content">{{ item.content }}</p>
+                <div v-if="item.reply" class="reply"><div class="reply-title"><span class="avatar team-avatar" aria-hidden="true">{{ $t('feedback.teamInitial') }}</span><strong>{{ $t('feedback.teamReply') }}</strong><time v-if="item.replied_at" :datetime="item.replied_at">{{ formatDate(item.replied_at) }}</time></div><p>{{ item.reply }}</p></div>
+              </article>
+              <div v-if="hasMore || page > 1" class="pagination"><button type="button" :disabled="page <= 1" @click="changePage(page - 1)">{{ $t('feedback.previous') }}</button><span>{{ page }}</span><button type="button" :disabled="!hasMore" @click="changePage(page + 1)">{{ $t('feedback.next') }}</button></div>
+            </template>
+          </div>
+        </section>
+
+      <div class="feedback-side">
       <header class="feedback-hero">
         <div class="hero-copy">
           <h1>{{ $t('feedback.heroTitle') }}</h1>
@@ -24,28 +43,6 @@
         </article>
         <div v-if="reviewHasMore || reviewPage > 1" class="pagination"><button type="button" :disabled="reviewPage <= 1" @click="changeReviewPage(reviewPage - 1)">{{ $t('feedback.previous') }}</button><span>{{ reviewPage }}</span><button type="button" :disabled="!reviewHasMore" @click="changeReviewPage(reviewPage + 1)">{{ $t('feedback.next') }}</button></div>
       </section>
-      <div class="feedback-layout">
-        <section class="board" aria-labelledby="board-title">
-          <div class="panel-heading board-heading">
-            <div><h2 id="board-title">{{ $t('feedback.boardTitle') }}</h2><p>{{ $t('feedback.boardSubtitle') }}</p></div>
-          </div>
-          <div class="board-body" aria-live="polite">
-            <div v-if="loading" class="board-state">{{ $t('feedback.loading') }}</div>
-            <div v-else-if="loadError" class="board-state"><p>{{ $t('feedback.loadFailed') }}</p><button type="button" class="text-button" @click="loadFeedback">{{ $t('feedback.retry') }}</button></div>
-            <div v-else-if="!items.length" class="board-state empty-state">
-              <h3>{{ $t('feedback.emptyTitle') }}</h3><p>{{ $t('feedback.emptyDescription') }}</p>
-            </div>
-            <template v-else>
-              <article v-for="item in items" :key="item.id" class="feedback-thread">
-                <div class="thread-meta"><span class="avatar user-avatar" aria-hidden="true">{{ $t('feedback.userInitial') }}</span><strong>{{ $t('feedback.anonymousUser') }}</strong><time v-if="item.created_at" :datetime="item.created_at">{{ formatDate(item.created_at) }}</time></div>
-                <p class="thread-content">{{ item.content }}</p>
-                <div v-if="item.reply" class="reply"><div class="reply-title"><span class="avatar team-avatar" aria-hidden="true">{{ $t('feedback.teamInitial') }}</span><strong>{{ $t('feedback.teamReply') }}</strong><time v-if="item.replied_at" :datetime="item.replied_at">{{ formatDate(item.replied_at) }}</time></div><p>{{ item.reply }}</p></div>
-              </article>
-              <div v-if="hasMore || page > 1" class="pagination"><button type="button" :disabled="page <= 1" @click="changePage(page - 1)">{{ $t('feedback.previous') }}</button><span>{{ page }}</span><button type="button" :disabled="!hasMore" @click="changePage(page + 1)">{{ $t('feedback.next') }}</button></div>
-            </template>
-          </div>
-        </section>
-
         <section class="form-panel panel" aria-labelledby="form-title">
           <div class="panel-heading form-heading"><div><h2 id="form-title">{{ $t('feedback.formTitle') }}</h2><p>{{ $t('feedback.formSubtitle') }}</p></div></div>
           <form class="form-body" @submit.prevent="submit">
@@ -114,13 +111,15 @@ export default {
 </script>
 
 <style scoped>
-.feedback-page { min-height: calc(100vh - 112px); box-sizing: border-box; padding: 56px 24px 90px; background: #fff; color: #291c16; text-align: left; }
-.feedback-wrap { max-width: 1160px; margin: 0 auto; }
-.feedback-hero { padding: 12px 0 48px; text-align: center; }
+.feedback-page { min-height: calc(100vh - 112px); box-sizing: border-box; background: linear-gradient(to right, #fbe5dc 0 58.33%, #fff 58.33%); color: #291c16; text-align: left; }
+.feedback-wrap { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); min-height: calc(100vh - 112px); }
+.board { width: min(100% - 64px, 680px); margin: 0 auto; padding: 190px 0 90px; box-sizing: border-box; }
+.feedback-side { width: min(100% - 64px, 450px); margin: 0 auto; padding: 90px 0; box-sizing: border-box; }
+.feedback-hero { padding: 0 0 80px; text-align: center; }
 .hero-copy { max-width: 720px; margin: 0 auto; }
 .hero-copy h1 { margin: 0 0 16px; color: #291c16; font-size: clamp(30px, 3.2vw, 42px); line-height: 1.25; letter-spacing: -.025em; }
 .hero-copy p { margin: 0 auto; max-width: 620px; color: #76665e; font-size: 16px; line-height: 1.8; }
-.feedback-layout { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(320px, 1fr); gap: 28px; align-items: start; }
+
 .panel { overflow: hidden; border: 2px solid #291c16; border-radius: 24px; background: #fff9f1; box-shadow: 5px 5px 0 #291c16; }
 .panel-heading { padding: 28px 30px 20px; }
 .board-heading { padding: 4px 2px 20px; }
@@ -128,10 +127,10 @@ export default {
 .panel-heading h2 { margin: 0; color: #291c16; font-size: 22px; line-height: 1.35; }
 .panel-heading p { margin: 7px 0 0; color: #76665e; font-size: 14px; line-height: 1.6; }
 .board-body { min-height: 0; padding: 0 5px 5px 0; }
-.board-state { min-height: 290px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-sizing: border-box; padding: 28px; border: 2px solid #291c16; border-radius: 24px; background: #f2ebfb; box-shadow: 5px 5px 0 #291c16; color: #655b65; line-height: 1.7; text-align: center; }
+.board-state { min-height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-sizing: border-box; padding: 28px; border: 2px solid #291c16; border-radius: 24px; background: #f2ebfb; box-shadow: 5px 5px 0 #291c16; color: #655b65; line-height: 1.7; text-align: center; }
 .board-state p { margin: 8px 0; }
 .board-state h3 { margin: 0; color: #291c16; font-size: 17px; }
-.feedback-thread { padding: 24px; border: 2px solid #291c16; border-radius: 22px; background: #f2ebfb; box-shadow: 5px 5px 0 #291c16; }
+.feedback-thread { min-height: 180px; box-sizing: border-box; padding: 24px; border: 2px solid #291c16; border-radius: 22px; background: #f2ebfb; box-shadow: 5px 5px 0 #291c16; }
 .feedback-thread + .feedback-thread { margin-top: 20px; }
 .thread-meta,.reply-title { display: flex; align-items: center; gap: 9px; color: #45352e; font-size: 14px; }
 .thread-meta time,.reply-title time { margin-left: auto; color: #8a7a71; font-size: 12px; }
@@ -175,12 +174,13 @@ export default {
 .review-actions .publish-button { background: #f279d0; }
 .review-actions button:disabled { opacity: .5; cursor: not-allowed; }
 @media (max-width: 760px) {
-  .feedback-page { padding: 30px 16px 60px; }
-  .feedback-hero { padding: 8px 0 30px; }
+  .feedback-page { background: #fbe5dc; }
+  .feedback-wrap { display: flex; flex-direction: column; }
+  .feedback-side { order: -1; width: 100%; padding: 36px 20px 40px; background: #fff; }
+  .board { width: 100%; padding: 36px 20px 60px; }
+  .feedback-hero { padding: 0 0 28px; }
   .hero-copy h1 { font-size: 28px; }
   .hero-copy p { font-size: 14px; }
-  .feedback-layout { grid-template-columns: 1fr; gap: 22px; }
-  .form-panel { order: -1; }
   .panel-heading { padding: 23px 22px 17px; }
   .board-heading { padding: 2px 2px 17px; }
   .board-body { padding: 0 5px 5px 0; }
