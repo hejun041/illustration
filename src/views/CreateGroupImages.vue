@@ -158,9 +158,12 @@
                         </div>
                         <div v-if="processing" class="result-loading">
                             <i class="el-icon-loading"></i>
-                            <p>{{ $t('createGroupImages.generating') }}</p>
+                            <p>{{ $t('createGroupImages.generatingProgress', { current: generationCurrent, total: generationTotal }) }}</p>
                         </div>
-                        <el-scrollbar v-if="filteredResultImages.length > 0 && !processing" class="result-scrollbar">
+                        <div v-if="generationErrors.length" class="generation-errors" role="alert">
+                            <p v-for="error in generationErrors" :key="error.order">{{ $t('createGroupImages.imageError', error) }}</p>
+                        </div>
+                        <el-scrollbar v-if="filteredResultImages.length > 0" class="result-scrollbar">
                             <div class="result-images">
                         <el-card 
                         v-for="(image, index) in filteredResultImages" 
@@ -215,6 +218,8 @@ import { ElMessage } from 'element-plus'
 import { takeCreateGroupImagesReference } from '@/utils/createGroupImagesHandoff';
 import { loadIllustrationStyles } from '@/utils/illustrationStyles';
 import { resolveStyleInfo } from '@/utils/characterStudioPrompt';
+import { postCreateCharacter, isCreateCharacterResponseOk, resolveGenerationImageUrl } from '@/utils/createCharacterTask';
+import { extractApiErrorMessage, extractErrorMessage } from '@/utils/insufficientPoints';
 
 const STYLE_STORAGE_KEY = 'createGroupImages_styleKey';
 
@@ -238,6 +243,9 @@ export default {
             
             // 处理状态
             processing: false,
+            generationCurrent: 0,
+            generationTotal: 0,
+            generationErrors: [],
             
             // 生成结果
             resultImages: [],
@@ -497,7 +505,7 @@ export default {
         
         // 提交生成
         async handleSubmit() {
-            if (!this.canSubmit) {
+            if (!this.canSubmit || this.processing) {
                 return;
             }
             if (this.styleMode === 'selected' && !this.styleInfoText) {
@@ -505,7 +513,7 @@ export default {
                 return;
             }
             this.processing = true;
-            this.resultImages = [];
+            this.generationErrors = [];
             
             try {
                 // 过滤掉空的prompt，并在每个prompt前拼接前缀
@@ -519,11 +527,6 @@ export default {
                     .filter(p => p && p.trim())
                     .map(p => `${prefix}${separator}${p.trim()}${stylePart}`);
                 
-                const characterId =
-                    localStorage.getItem('lastCharacterId') ||
-                    localStorage.getItem('viewCharacterId');
-                const useCharacterId = Boolean(characterId && !this.referenceFile);
-
                 let referenceImageBase64 = null;
                 if (this.referenceImageUrl) {
                     if (this.referenceImageUrl.startsWith('data:')) {
@@ -544,59 +547,44 @@ export default {
                     }
                 }
 
-                const requestData = {
-                    prompts: validPrompts,
-                    size: '1280x960',
-                };
-                if (useCharacterId) {
-                    requestData.character_id = characterId;
-                }
-                requestData.reference_image = referenceImageBase64;
-                
-                // 不再使用参考图的原始尺寸，始终使用固定的 1280x960
-                
-                // 调用API（这里需要根据实际后端API调整）
-                const apiUrl = this.apiBaseUrl 
-                    ? `${this.apiBaseUrl}/create-group-images`
-                    : '/create-group-images';
-                
-                const response = await this.$http.post(apiUrl, requestData, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + (localStorage.getItem('token') || '')
-                    },
-                    timeout: 300000 // 5分钟超时
-                });
-                
-                // 处理响应
-                const responseData = response.data;
-                
-                if (responseData.code === 0 || responseData.desc === 'success') {
-                    const result = responseData.message || responseData.data || responseData;
-                    
-                    // 如果后端返回了最新积分，更新全局用户信息，TopBar 会自动刷新显示
-                    if (result && typeof result === 'object' && result.points !== undefined && this.$store && this.$store.state) {
-                        this.$store.commit('setUserInfo', {
-                            ...(this.$store.state.userInfo || {}),
-                            points: result.points
-                        })
+                if (!referenceImageBase64) throw new Error(this.$t('createGroupImages.noCharacterImage'));
+
+                this.resultImages = [];
+                this.saveGroupImagesToLocalStorage(this.resultImages);
+                this.generationTotal = validPrompts.length;
+                for (let index = 0; index < validPrompts.length; index++) {
+                    this.generationCurrent = index + 1;
+                    try {
+                        const responseData = await postCreateCharacter(this.$http, {
+                            prompt: validPrompts[index],
+                            size: '1280x960',
+                            image: referenceImageBase64,
+                            watermark: false,
+                        }, { apiBaseUrl: this.apiBaseUrl, source: 'group_images' });
+                        if (!isCreateCharacterResponseOk(responseData) || !responseData.message) {
+                            throw new Error(extractApiErrorMessage(responseData) || this.$t('createGroupImages.generateFailed'));
+                        }
+                        const result = responseData.message;
+                        if (result.points !== undefined && this.$store?.state) {
+                            this.$store.commit('setUserInfo', {
+                                ...(this.$store.state.userInfo || {}),
+                                points: result.points,
+                            });
+                        }
+                        const imageUrl = resolveGenerationImageUrl(result, this.apiBaseUrl);
+                        if (!imageUrl) throw new Error(this.$t('createGroupImages.noGeneratedImage'));
+                        this.resultImages.push({ url: imageUrl, order: index + 1 });
+                        this.saveGroupImagesToLocalStorage(this.resultImages);
+                    } catch (error) {
+                        this.generationErrors.push({
+                            order: index + 1,
+                            message: extractErrorMessage(error) || this.$t('createGroupImages.generateFailed'),
+                        });
+                        if (error.insufficientPoints) break;
                     }
-                    
-                    // 提取图片URL数组
-                    if (result.images && Array.isArray(result.images)) {
-                        this.resultImages = result.images.map((img, idx) => ({ url: img, order: idx + 1 }));
-                    } else if (result.image_urls && Array.isArray(result.image_urls)) {
-                        this.resultImages = result.image_urls.map((img, idx) => ({ url: img, order: idx + 1 }));
-                    }
-                    
-                    // 保存生成的组图到localStorage
-                    this.saveGroupImagesToLocalStorage(this.resultImages);
-                } else {
-                    const errorMsg = responseData.message || responseData.desc || this.$t('createGroupImages.generateFailed');
-                    throw new Error(errorMsg);
                 }
             } catch (error) {
-                console.error('生成组图失败:', error);
+                ElMessage.error(extractErrorMessage(error) || this.$t('createGroupImages.generateFailed'));
             } finally {
                 this.processing = false;
             }
@@ -1364,6 +1352,12 @@ export default {
     overflow-x: hidden;
 }
 
+.generation-errors {
+    color: #b42318;
+    font-size: 13px;
+    padding: 0 16px;
+}
+
 .result-placeholder,
 .result-loading {
     display: flex;
@@ -1372,6 +1366,12 @@ export default {
     justify-content: center;
     height: 100%;
     color: #909399;
+}
+
+.result-loading {
+    height: auto;
+    flex: none;
+    padding: 16px;
 }
 
 .result-placeholder i,
