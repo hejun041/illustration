@@ -13,11 +13,14 @@
                                 v-model="form.prompt"
                                 :disabled="generating || generatingImages"
                                 type="textarea"
-                                :autosize="{ minRows: 10, maxRows: 24 }"
+                                :autosize="promptExpanded ? { minRows: 10, maxRows: 24 } : { minRows: 3, maxRows: 4 }"
                                 resize="vertical"
                                 :placeholder="$t('aibooks.promptPlaceholder')"
                                 class="prompt-input">
                             </el-input>
+                            <button type="button" class="prompt-expand-toggle" :aria-expanded="promptExpanded" @click="promptExpanded = !promptExpanded">
+                                {{ promptExpanded ? ($i18n.locale === 'en' ? 'Collapse prompt' : '收起提示词') : ($i18n.locale === 'en' ? 'Expand prompt' : '展开完整提示词') }}
+                            </button>
                         </el-form-item>
 
                         <el-form-item :label="$i18n.locale === 'en' ? 'Story pages' : '正文页数'">
@@ -100,15 +103,19 @@
                         <h3 class="prompts-title">{{ $t('aibooks.characterCard') }}</h3>
                         <p class="character-card-hint">{{ $t('aibooks.characterCardHint') }}</p>
                         <div v-if="displayCharacterProfiles.length" class="character-profile-list">
-                            <article v-for="(profile, index) in displayCharacterProfiles" :key="index" class="character-profile">
-                                <span class="character-avatar" :class="{ supporting: index > 0 }" aria-hidden="true">{{ profile.name.slice(0, 1) }}</span>
-                                <div class="character-profile-content">
-                                    <strong>{{ profile.name }}</strong>
-                                    <div class="character-tags">
-                                        <span v-for="(trait, traitIndex) in characterTraits(profile)" :key="traitIndex" class="character-tag">{{ trait }}</span>
-                                    </div>
+                            <details v-for="(profile, index) in displayCharacterProfiles" :key="index" class="character-profile">
+                                <summary class="character-profile-summary">
+                                    <span class="character-avatar" :class="{ supporting: index > 0 }" aria-hidden="true">{{ profile.name.slice(0, 1) }}</span>
+                                    <span class="character-profile-content">
+                                        <strong>{{ profile.name }}</strong>
+                                        <span class="character-profile-preview">{{ characterTraits(profile).slice(0, 3).join(' · ') }}</span>
+                                    </span>
+                                    <span class="character-profile-toggle" aria-hidden="true">⌄</span>
+                                </summary>
+                                <div class="character-tags">
+                                    <span v-for="(trait, traitIndex) in characterTraits(profile)" :key="traitIndex" class="character-tag">{{ trait }}</span>
                                 </div>
-                            </article>
+                            </details>
                         </div>
                         <details class="character-edit-details" :open="!displayCharacterProfiles.length">
                             <summary>{{ $i18n.locale === 'en' ? 'Edit character descriptions' : '编辑角色设定' }}</summary>
@@ -424,6 +431,7 @@ export default {
     },
     data() {
         return {
+            promptExpanded: false,
             downloading: false,
             collectingImageUrls: {},
             form: {
@@ -1711,6 +1719,8 @@ export default {
 .prompt-input {
     width: 100%;
 }
+.prompt-expand-toggle { border: 0; background: none; padding: 2px 0; color: #5268bc; cursor: pointer; font: inherit; font-size: 13px; }
+.prompt-expand-toggle:focus-visible, .character-profile-summary:focus-visible { outline: 2px solid #386af4; outline-offset: 2px; }
 .book-form :deep(.el-form-item__content) { min-width: 0; }
 .prompt-input :deep(textarea), .prompt-textarea :deep(textarea) { line-height: 1.7; }
 .style-reference-hint { margin: 6px 0 0; font-size: 12px; line-height: 1.6; color: #606266; }
@@ -1775,14 +1785,17 @@ export default {
 }
 .character-profile-list { display: grid; gap: 10px; margin: 14px 0; }
 .character-profile {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
     padding: 14px;
     border: 1px solid #edf0f7;
     border-radius: 10px;
     background: #fff;
 }
+.character-profile-summary { display: flex; align-items: center; gap: 12px; cursor: pointer; list-style: none; }
+.character-profile-summary::-webkit-details-marker { display: none; }
+.character-profile-preview { display: block; margin-top: 3px; color: #606a7d; font-size: 13px; line-height: 1.5; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.character-profile-content { flex: 1; }
+.character-profile-toggle { color: #5268bc; font-size: 20px; }
+.character-profile[open] .character-profile-toggle { transform: rotate(180deg); }
 .character-avatar {
     display: grid;
     flex: 0 0 38px;
@@ -1795,7 +1808,7 @@ export default {
 }
 .character-avatar.supporting { background: #efa94e; }
 .character-profile-content { min-width: 0; color: #303133; }
-.character-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.character-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 0 50px; }
 .character-tag {
     max-width: 100%;
     padding: 5px 9px;
