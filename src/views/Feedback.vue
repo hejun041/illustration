@@ -10,9 +10,9 @@
             </div>
             <template v-else>
               <article v-for="item in items" :key="item.id" class="feedback-thread">
-                <div class="thread-meta"><span class="avatar user-avatar" aria-hidden="true">{{ $t('feedback.userInitial') }}</span><strong>{{ $t('feedback.anonymousUser') }}</strong><time v-if="item.created_at" :datetime="item.created_at">{{ formatDate(item.created_at) }}</time></div>
+                <div class="thread-meta"><strong>{{ $t('feedback.anonymousUser') }}</strong><time v-if="item.created_at" :datetime="item.created_at">{{ formatDate(item.created_at) }}</time></div>
                 <p class="thread-content">{{ item.content }}</p>
-                <div v-if="item.reply" class="reply"><div class="reply-title"><span class="avatar team-avatar" aria-hidden="true">{{ $t('feedback.teamInitial') }}</span><strong>{{ $t('feedback.teamReply') }}</strong><time v-if="item.replied_at" :datetime="item.replied_at">{{ formatDate(item.replied_at) }}</time></div><p>{{ item.reply }}</p></div>
+                <div v-if="item.reply" class="reply"><div class="reply-title"><strong>{{ $t('feedback.teamReply') }}</strong><time v-if="item.replied_at" :datetime="item.replied_at">{{ formatDate(item.replied_at) }}</time></div><p>{{ item.reply }}</p></div>
               </article>
               <div v-if="hasMore || page > 1" class="pagination"><button type="button" :disabled="page <= 1" @click="changePage(page - 1)">{{ $t('feedback.previous') }}</button><span>{{ page }}</span><button type="button" :disabled="!hasMore" @click="changePage(page + 1)">{{ $t('feedback.next') }}</button></div>
             </template>
@@ -99,13 +99,10 @@ export default {
 .feedback-thread + .feedback-thread { margin-top: 20px; }
 .thread-meta,.reply-title { display: flex; align-items: center; gap: 9px; color: #45352e; font-size: 14px; }
 .thread-meta time,.reply-title time { margin-left: auto; color: #8a7a71; font-size: 12px; }
-.avatar { display: grid; flex: none; place-items: center; width: 30px; height: 30px; border: 1px solid #291c16; border-radius: 50%; font-size: 12px; font-weight: 700; }
-.user-avatar { background: #f7e5d2; color: #5f493c; }
-.team-avatar { background: #b9e4f2; color: #254d5e; }
 .thread-content,.reply p { overflow-wrap: anywhere; white-space: pre-wrap; font-size: 14px; line-height: 1.8; }
 .thread-content { margin: 14px 0 0; color: #453a35; }
 .reply { margin-top: 16px; padding: 15px 16px; border: 1px solid #d4c8e2; border-radius: 14px; background: #fff; }
-.reply p { margin: 10px 0 0 39px; color: #675951; }
+.reply p { margin: 10px 0 0; color: #675951; }
 .form-body { padding: 0 30px 30px; }
 .field-label { display: block; margin-bottom: 10px; color: #45352e; font-size: 15px; font-weight: 700; }
 .feedback-input :deep(.el-textarea__inner) { min-height: 210px; padding: 15px 16px 28px; border-radius: 14px; background: #fff; box-shadow: 0 0 0 1px #bbaea4 inset; font-size: 14px; line-height: 1.7; resize: vertical; }
