@@ -26,22 +26,6 @@
         </div>
       </header>
 
-      <div v-if="isAdmin" class="admin-toolbar"><button type="button" class="admin-toggle" @click="toggleReview">{{ showReview ? $t('feedback.closeReview') : $t('feedback.reviewButton') }}</button></div>
-      <section v-if="showReview && isAdmin" class="review-panel panel" aria-labelledby="review-title">
-        <div class="review-header"><h2 id="review-title">{{ $t('feedback.reviewTitle') }}</h2><p>{{ $t('feedback.reviewHint') }}</p></div>
-        <div v-if="reviewLoading" class="review-message">{{ $t('feedback.loading') }}</div>
-        <div v-else-if="reviewError" class="review-message">{{ $t('feedback.loadFailed') }} <button type="button" class="text-button" @click="loadReview">{{ $t('feedback.retry') }}</button></div>
-        <div v-else-if="!reviewItems.length" class="review-message">{{ $t('feedback.reviewEmpty') }}</div>
-        <article v-for="item in reviewItems" :key="item.id" class="review-item">
-          <div class="review-meta"><strong>{{ item.is_published ? $t('feedback.published') : $t('feedback.private') }}</strong><time v-if="item.created_at">{{ formatDate(item.created_at) }}</time></div>
-          <p class="original-label">{{ $t('feedback.original') }}</p><p class="original-content">{{ item.content }}</p>
-          <button type="button" class="text-button copy-original" @click="item.public_content = item.content">{{ $t('feedback.copyOriginal') }}</button>
-          <label :for="'public-' + item.id">{{ $t('feedback.publicCopy') }}</label><textarea :id="'public-' + item.id" v-model="item.public_content" maxlength="2000" rows="3"></textarea>
-          <label :for="'reply-' + item.id">{{ $t('feedback.replyLabel') }}</label><textarea :id="'reply-' + item.id" v-model="item.reply" maxlength="2000" rows="3"></textarea>
-          <div class="review-actions"><button type="button" :disabled="reviewSaving" @click="saveReview(item, false)">{{ $t('feedback.keepPrivate') }}</button><button type="button" class="publish-button" :disabled="reviewSaving || !item.public_content.trim()" @click="saveReview(item, true)">{{ $t('feedback.publish') }}</button></div>
-        </article>
-        <div v-if="reviewHasMore || reviewPage > 1" class="pagination"><button type="button" :disabled="reviewPage <= 1" @click="changeReviewPage(reviewPage - 1)">{{ $t('feedback.previous') }}</button><span>{{ reviewPage }}</span><button type="button" :disabled="!reviewHasMore" @click="changeReviewPage(reviewPage + 1)">{{ $t('feedback.next') }}</button></div>
-      </section>
         <section class="form-panel panel" aria-labelledby="form-title">
           <div class="panel-heading form-heading"><div><h2 id="form-title">{{ $t('feedback.formTitle') }}</h2><p>{{ $t('feedback.formSubtitle') }}</p></div></div>
           <form class="form-body" @submit.prevent="submit">
@@ -60,33 +44,15 @@
 <script>
 import { ElMessage } from 'element-plus';
 import { mapState } from 'vuex';
-import { submitUserFeedback, listPublicFeedback, listFeedbackForReview, reviewFeedback } from '@/utils/feedbackApi';
-import { isCurrentUserAdmin } from '@/utils/auth';
+import { submitUserFeedback, listPublicFeedback } from '@/utils/feedbackApi';
 const MIN_LEN = 5;
 const MAX_LEN = 2000;
 export default {
   name: 'FeedbackPage',
-  data() { return { content: '', submitting: false, maxLen: MAX_LEN, apiBaseUrl: process.env.VUE_APP_API_BASE_URL || '', items: [], loading: true, loadError: false, page: 1, hasMore: false, showReview: false, reviewItems: [], reviewLoading: false, reviewError: false, reviewSaving: false, reviewPage: 1, reviewHasMore: false }; },
-  computed: { ...mapState(['isLogin']), isAdmin() { return this.isLogin && isCurrentUserAdmin(); }, canSubmit() { const len = (this.content || '').trim().length; return len >= MIN_LEN && len <= MAX_LEN && !this.submitting; } },
+  data() { return { content: '', submitting: false, maxLen: MAX_LEN, apiBaseUrl: process.env.VUE_APP_API_BASE_URL || '', items: [], loading: true, loadError: false, page: 1, hasMore: false }; },
+  computed: { ...mapState(['isLogin']), canSubmit() { const len = (this.content || '').trim().length; return len >= MIN_LEN && len <= MAX_LEN && !this.submitting; } },
   mounted() { this.loadFeedback(); },
   methods: {
-    toggleReview() { this.showReview = !this.showReview; if (this.showReview) this.loadReview(); },
-    async loadReview() {
-      this.reviewLoading = true; this.reviewError = false;
-      try { const result = await listFeedbackForReview(this.$http, { page: this.reviewPage, apiBaseUrl: this.apiBaseUrl }); this.reviewItems = result.items; this.reviewHasMore = result.hasMore; }
-      catch (error) { this.reviewError = true; }
-      finally { this.reviewLoading = false; }
-    },
-    changeReviewPage(page) { this.reviewPage = page; this.loadReview(); },
-    async saveReview(item, isPublished) {
-      if (this.reviewSaving) return;
-      this.reviewSaving = true;
-      try {
-        await reviewFeedback(this.$http, { id: item.id, publicContent: item.public_content.trim(), reply: item.reply.trim(), isPublished, apiBaseUrl: this.apiBaseUrl });
-        item.is_published = isPublished; ElMessage.success(this.$t('feedback.reviewSaved')); await this.loadFeedback();
-      } catch (error) { ElMessage.error(error?.message || this.$t('feedback.reviewFailed')); }
-      finally { this.reviewSaving = false; }
-    },
     async loadFeedback() {
       this.loading = true; this.loadError = false;
       try { const result = await listPublicFeedback(this.$http, { page: this.page, apiBaseUrl: this.apiBaseUrl }); this.items = result.items; this.hasMore = result.hasMore; }
@@ -155,23 +121,6 @@ export default {
 .pagination { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 14px; color: #76665e; font-size: 14px; }
 .pagination button { padding: 8px; }
 .pagination button:disabled { opacity: .4; cursor: not-allowed; }
-.admin-toolbar { display: flex; justify-content: flex-end; margin: 0 0 16px; }
-.admin-toggle { padding: 9px 14px; border: 1px solid #291c16; border-radius: 999px; background: #fff9f1; color: #291c16; cursor: pointer; }
-.review-panel { margin-bottom: 30px; padding: 26px 30px; }
-.review-header h2 { margin: 0 0 6px; color: #291c16; font-size: 20px; }
-.review-header p,.review-message { color: #76665e; font-size: 13px; line-height: 1.6; }
-.review-item { margin-top: 20px; padding-top: 20px; border-top: 1px solid #e7dcd2; }
-.review-meta { display: flex; gap: 14px; color: #76665e; font-size: 13px; }
-.original-label,.review-item label { color: #45352e; font-size: 13px; font-weight: 700; }
-.original-label { margin: 15px 0 6px; }
-.original-content { margin: 0; overflow-wrap: anywhere; white-space: pre-wrap; font-size: 14px; line-height: 1.7; }
-.copy-original { padding: 8px 0; }
-.review-item label { display: block; margin: 12px 0 7px; }
-.review-item textarea { box-sizing: border-box; width: 100%; padding: 10px; border: 1px solid #bbaea4; border-radius: 10px; font: inherit; line-height: 1.6; resize: vertical; }
-.review-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 12px; }
-.review-actions button { padding: 9px 16px; border: 1px solid #291c16; border-radius: 999px; background: #fff; color: #291c16; cursor: pointer; }
-.review-actions .publish-button { background: #f279d0; }
-.review-actions button:disabled { opacity: .5; cursor: not-allowed; }
 @media (max-width: 760px) {
   .feedback-page { background: #fbe5dc; }
   .feedback-wrap { display: flex; flex-direction: column; }
@@ -184,6 +133,5 @@ export default {
   .board-body { padding: 0 5px 5px 0; }
   .feedback-thread { padding: 20px; }
   .form-body { padding: 0 22px 26px; }
-  .review-panel { padding: 22px; }
 }
 </style>

@@ -597,6 +597,11 @@ const routes = [{
         meta: { requiresAuth: true, requiresAdmin: true, seoTitle: '积分奖励 · 管理后台' },
     },
     {
+        path: '/admin/feedback', name: 'admin-feedback',
+        component: () => import(/* webpackChunkName: "admin-feedback" */ '../views/AdminFeedback.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true, seoTitle: '意见建议 · 管理后台' },
+    },
+    {
         path: '/member/recharge',
         name: 'member-recharge',
         component: () =>

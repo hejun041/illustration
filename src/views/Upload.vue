@@ -1,7 +1,7 @@
 <template>
     <div class="upload-page">
         <div class="upload-container">
-            <router-link v-if="isAdmin" to="/admin/books" class="admin-entry">管理后台 · 绘本审核与积分奖励 →</router-link>
+            <router-link v-if="isAdmin" to="/admin/books" class="admin-entry">管理后台 →</router-link>
           
             <div class="upload-cards">
                 <router-link to="/user/upload/upload-illustration" class="upload-card">

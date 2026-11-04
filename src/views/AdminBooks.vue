@@ -4,6 +4,7 @@
       <div class="admin-brand">KidStory <span>管理后台</span></div>
       <router-link to="/admin/books" :class="{ active: !rewardsView }">绘本审核</router-link>
       <router-link to="/admin/rewards" :class="{ active: rewardsView }">积分奖励</router-link>
+      <router-link to="/admin/feedback">意见建议</router-link>
       <router-link to="/creation-studio/book/mine">返回我的绘本 ↗</router-link>
       <p>仅管理员可访问</p>
     </aside>
