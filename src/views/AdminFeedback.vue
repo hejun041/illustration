@@ -5,6 +5,8 @@
       <router-link to="/admin/books">绘本审核</router-link>
       <router-link to="/admin/rewards">积分奖励</router-link>
       <router-link to="/admin/feedback" class="active">意见建议</router-link>
+      <router-link to="/admin/users">用户分析</router-link>
+      <AdminUserCount />
       <router-link to="/creation-studio/book/mine">返回我的绘本 ↗</router-link>
     </aside>
     <main class="content">
@@ -26,10 +28,12 @@
   </div>
 </template>
 <script>
+import AdminUserCount from '@/components/AdminUserCount.vue'
 import { ElMessage } from 'element-plus'
 import { listFeedbackForReview, reviewFeedback } from '@/utils/feedbackApi'
 export default {
   name: 'AdminFeedback',
+  components: { AdminUserCount },
   data() { return { items: [], page: 1, hasMore: false, loading: false, error: false, saving: null, apiBaseUrl: process.env.VUE_APP_API_BASE_URL || '' } },
   mounted() { this.load() },
   methods: {

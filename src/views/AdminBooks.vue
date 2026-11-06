@@ -5,6 +5,8 @@
       <router-link to="/admin/books" :class="{ active: !rewardsView }">绘本审核</router-link>
       <router-link to="/admin/rewards" :class="{ active: rewardsView }">积分奖励</router-link>
       <router-link to="/admin/feedback">意见建议</router-link>
+      <router-link to="/admin/users">用户分析</router-link>
+      <AdminUserCount />
       <router-link to="/creation-studio/book/mine">返回我的绘本 ↗</router-link>
       <p>仅管理员可访问</p>
     </aside>
@@ -98,11 +100,13 @@
 </template>
 
 <script>
+import AdminUserCount from '@/components/AdminUserCount.vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { bookReviewRequest } from '@/utils/bookReviewApi'
 import { resolveBookReviewImage, getBookReviewPages } from '@/utils/bookReviewImages'
 export default {
   name: 'AdminBooks',
+  components: { AdminUserCount },
   data() { return { books: [], total: 0, page: 1, pageSize: 20, keyword: '', status: '1', rewardStatus: '', loading: false, error: '', requestId: 0,
     detailVisible: false, detailLoading: false, detailError: '', detail: null, pages: [], previewIndex: 0, reason: '', rewardPoints: 100, busyId: '', detailRequestId: 0 } },
   computed: {
