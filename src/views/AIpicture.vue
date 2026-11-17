@@ -103,8 +103,9 @@
                             </template>
                             <template v-if="activeStyleCategory === 'christmas' || isSearchingStyles">
                                 <button v-for="item in displayedChristmasItems" :key="item.id" type="button" class="style-list-item" :class="{ selected: selectedOaiTemplateId === item.id }" :title="$i18n.locale === 'en' ? item.title : item.titleZh" @click="selectChristmasTemplate(item)">
-                                    <div class="style-list-item-thumb" @mouseenter="enterStylePreview($event, item.image, $i18n.locale === 'en' ? item.title : item.titleZh)" @mouseleave="beginLeaveStylePreview">
-                                        <img v-lazy-style-image="item.image" :alt="$i18n.locale === 'en' ? item.title : item.titleZh" class="style-list-item-img" decoding="async" />
+                                    <div class="style-list-item-thumb" @mouseenter="!christmasImageErrors[item.id] && enterStylePreview($event, item.image, $i18n.locale === 'en' ? item.title : item.titleZh)" @mouseleave="beginLeaveStylePreview">
+                                        <img v-if="!christmasImageErrors[item.id]" v-lazy-style-image="item.image" :alt="$i18n.locale === 'en' ? item.title : item.titleZh" class="style-list-item-img" decoding="async" @error="christmasImageErrors[item.id] = true" />
+                                        <div v-else class="style-list-item-img christmas-image-fallback">{{ $i18n.locale === 'en' ? 'Preview unavailable' : '暂无预览图' }}</div>
                                     </div>
                                     <span class="style-list-item-text">{{ $i18n.locale === 'en' ? item.title : item.titleZh }}</span>
                                 </button>
@@ -616,6 +617,7 @@ export default {
             styleSearchQuery: '',
             oaiItems: oaiImageData.items,
             christmasItems: christmasCardPrompts,
+            christmasImageErrors: {},
             displayOrderChristmas: [],
             christmasSource: 'https://github.com/YouMind-OpenLab/awesome-christmas-card-prompts/tree/f1cf8f99808e5d54510519c98acb0305db80d8b7',
             selectedOaiTemplateId: null,
@@ -2751,6 +2753,7 @@ export default {
 }
 .christmas-credit { margin: 8px 0 0; color: #756e69; font-size: 12px; line-height: 1.6; }
 .christmas-credit a { color: #6650a5; }
+.christmas-image-fallback { display: flex; align-items: center; justify-content: center; background: #f2edf7; color: #6d5a7b; font-size: 13px; }
 
 .style-tab-row::-webkit-scrollbar {
     display: none;
