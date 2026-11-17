@@ -611,7 +611,7 @@ export default {
   display: flex;
   align-items: flex-start;
   flex-wrap: wrap;
-  gap: 20px 28px;
+  gap: 20px 32px;
   padding-bottom: 20px;
   border-bottom: 1px solid var(--border);
 }
@@ -629,7 +629,9 @@ export default {
   flex-wrap: wrap;
   gap: 8px;
 }
+.pill-row { padding: 4px; border-radius: 12px; }
 .tool-pill {
+  min-height: 40px;
   padding: 8px 14px;
   border-radius: 8px;
   border: 1px solid var(--border);
@@ -660,7 +662,7 @@ export default {
 }
 .canvas-panel {
   min-width: 0;
-  padding: 16px;
+  padding: 12px;
   border-radius: 12px;
   background: #faf9fc;
   border: 1px solid #eeeaf3;
@@ -687,6 +689,21 @@ export default {
   flex-wrap: wrap;
   gap: 12px 20px;
 }
+.canvas-panel :deep(.matte-tools) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px 20px;
+  padding: 18px 20px;
+  background: #fff;
+}
+.canvas-panel :deep(.matte-tools .tool-heading),
+.canvas-panel :deep(.matte-tools .tool-row) { grid-column: 1; }
+.canvas-panel :deep(.matte-tools .tool-row) { flex-wrap: wrap; gap: 12px 24px; }
+.canvas-panel :deep(.matte-tools .brush-help) { grid-column: 1; background: transparent; padding: 0; }
+.canvas-panel :deep(.matte-tools .matte-hint) { grid-column: 1; }
+.canvas-panel :deep(.matte-tools .tool-actions) { grid-column: 2; grid-row: 1 / span 4; }
+.canvas-panel :deep(.matte-tools .el-radio-button__inner) { min-height: 36px; display: inline-flex; align-items: center; }
 .canvas-panel :deep(.tool-row) {
   flex-direction: row;
   align-items: center;
@@ -739,9 +756,10 @@ export default {
   border-top: 1px solid var(--border);
 }
 .text-action {
-  padding: 0;
-  border: none;
-  background: none;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
   color: var(--accent);
   font: inherit;
   font-size: 13px;
@@ -803,6 +821,9 @@ export default {
 }
 }
 @media (max-width: 760px) {
+  .canvas-panel :deep(.matte-tools) { grid-template-columns: minmax(0, 1fr); padding: 16px; }
+  .canvas-panel :deep(.matte-tools .tool-actions) { grid-column: 1; grid-row: auto; }
+  .action-row button { flex: 1; }
   .sticker-workshop {
   padding: 24px 12px 40px;
 }

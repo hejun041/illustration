@@ -30,8 +30,8 @@
   text-align: left;
   padding-bottom: 24px;
   margin-bottom: 28px;
-  border-bottom: var(--tool-line);
 }
+#app.tool-story-theme :is(.collage-header, .dt-header, .segment-page-header, .page-head) { border-bottom: var(--tool-line); }
 #app.tool-story-theme :is(.collage-header h1, .dt-header h1, .segment-page-header h1, .workshop-hero h1, .page-head h2) { color: var(--tool-ink); font-family: inherit; font-size: clamp(26px, 3vw, 36px); line-height: 1.45; font-weight: 650; letter-spacing: 0; }
 #app.tool-story-theme :is(.collage-header p, .dt-header p, .segment-page-header p, .hero-desc, .page-head p) { color: var(--tool-muted); font-size: 14px; line-height: 1.8; margin: 10px 0 0; }
 #app.tool-story-theme .eyebrow { display: inline-block; padding: 5px 12px; border: var(--tool-line); border-radius: 24px; background: #00cba0; color: var(--tool-ink); letter-spacing: 1.5px; font-size: 10px; }

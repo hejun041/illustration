@@ -20,17 +20,21 @@
     <div class="matte-tools">
       <div class="tool-heading">{{ $t('stickerLab.refineTitle') }}</div>
       <div class="tool-row">
+        <div class="tool-group">
         <span class="tool-label">{{ $t('stickerLab.brushMode') }}</span>
         <el-radio-group v-model="brush" size="small" :disabled="!ready || segmenting">
           <el-radio-button label="erase">{{ $t('stickerLab.brushErase') }}</el-radio-button>
           <el-radio-button label="restore">{{ $t('stickerLab.brushRestore') }}</el-radio-button>
         </el-radio-group>
+        </div>
+        <div class="tool-group">
         <span class="tool-label">{{ $t('stickerLab.brushSizeLabel') }}</span>
         <el-radio-group v-model="brushSize" size="small" class="size-group" :disabled="!ready || segmenting">
           <el-radio-button :label="16">{{ $t('stickerLab.brushSmall') }}</el-radio-button>
           <el-radio-button :label="28">{{ $t('stickerLab.brushMedium') }}</el-radio-button>
           <el-radio-button :label="44">{{ $t('stickerLab.brushLarge') }}</el-radio-button>
         </el-radio-group>
+        </div>
       </div>
       <p class="brush-help">{{ $t(brush === 'restore' ? 'stickerLab.restoreHelp' : 'stickerLab.eraseHelp') }}</p>
       <p v-if="embedded" class="matte-hint">{{ $t('stickerLab.matteHintEmbedded') }}</p>
@@ -105,22 +109,11 @@ function getCtx() {
   return canvasRef.value?.getContext('2d');
 }
 
-function drawChecker(ctx, w, h) {
-  const size = 12;
-  for (let y = 0; y < h; y += size) {
-    for (let x = 0; x < w; x += size) {
-      ctx.fillStyle = (x / size + y / size) % 2 === 0 ? '#eee' : '#fff';
-      ctx.fillRect(x, y, size, size);
-    }
-  }
-}
-
 function redrawDisplay() {
   const canvas = canvasRef.value;
   const ctx = getCtx();
   if (!canvas || !ctx || !matteCanvas) return;
   ctx.clearRect(0, 0, display.w, display.h);
-  drawChecker(ctx, display.w, display.h);
   ctx.drawImage(matteCanvas, 0, 0, display.w, display.h);
 }
 
@@ -387,6 +380,7 @@ onBeforeUnmount(() => {
   flex-direction: column;
   gap: 10px;
 }
+.tool-group { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
 
 .tool-label {
   font-size: 12px;
