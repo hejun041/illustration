@@ -21,7 +21,7 @@
                             <input ref="styleSearchInput" v-model="styleSearchQuery" type="search" :aria-label="$t('aiPicture.searchStylesPlaceholder')" :placeholder="$t('aiPicture.searchStylesPlaceholder')" @keydown.esc="toggleStyleSearch" />
                             <button v-if="styleSearchQuery" type="button" class="link-btn" @click="styleSearchQuery = ''">{{ $t('aiPicture.clearStyleSearch') }}</button>
                         </form>
-                        <p v-if="isSearchingStyles" class="style-search-status" role="status">{{ $t('aiPicture.styleSearchCount', { count: visibleStyles.length + visibleOaiItems.length }) }}</p>
+                        <p v-if="isSearchingStyles" class="style-search-status" role="status">{{ $t('aiPicture.styleSearchCount', { count: visibleStyles.length + visibleOaiItems.length + visibleChristmasItems.length }) }}</p>
 
                         <div
                             class="style-tab-row"
@@ -44,7 +44,7 @@
                         </div>
 
                         <div class="style-list" ref="styleListRef">
-                            <p v-if="!stylesLoading && !displayedStyles.length && !((activeStyleCategory === 'skill' || isSearchingStyles) && displayedOaiItems.length)" class="style-empty-state">
+                            <p v-if="!stylesLoading && !displayedStyles.length && !((activeStyleCategory === 'skill' || isSearchingStyles) && displayedOaiItems.length) && !((activeStyleCategory === 'christmas' || isSearchingStyles) && visibleChristmasItems.length)" class="style-empty-state">
                                 {{ $t(isSearchingStyles ? 'aiPicture.styleSearchEmpty' : 'aiPicture.styleCategoryEmpty') }}
                             </p>
                             <button
@@ -101,7 +101,20 @@
                                     <span class="style-list-item-text">{{ item.title }}</span>
                                 </button>
                             </template>
+                            <template v-if="activeStyleCategory === 'christmas' || isSearchingStyles">
+                                <button v-for="item in displayedChristmasItems" :key="item.id" type="button" class="style-list-item" :class="{ selected: selectedOaiTemplateId === item.id }" :title="$i18n.locale === 'en' ? item.title : item.titleZh" @click="selectChristmasTemplate(item)">
+                                    <div class="style-list-item-thumb" @mouseenter="enterStylePreview($event, item.image, $i18n.locale === 'en' ? item.title : item.titleZh)" @mouseleave="beginLeaveStylePreview">
+                                        <img v-lazy-style-image="item.image" :alt="$i18n.locale === 'en' ? item.title : item.titleZh" class="style-list-item-img" decoding="async" />
+                                    </div>
+                                    <span class="style-list-item-text">{{ $i18n.locale === 'en' ? item.title : item.titleZh }}</span>
+                                </button>
+                            </template>
                         </div>
+                        <p v-if="activeStyleCategory === 'christmas' || selectedChristmasItem" class="christmas-credit">
+                            <template v-if="selectedChristmasItem">{{ $i18n.locale === 'en' ? 'Prompt by' : '提示词作者' }}: <a :href="selectedChristmasItem.authorUrl || christmasSource" target="_blank" rel="noopener noreferrer">{{ selectedChristmasItem.author }}</a> · </template>
+                            <a :href="christmasSource" target="_blank" rel="noopener noreferrer">YouMind OpenLab</a> · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a> · {{ $i18n.locale === 'en' ? 'Defaults substituted for template fields' : '已将模板字段替换为默认内容' }}
+                            <a v-if="selectedChristmasItem && selectedChristmasItem.sourceUrl" :href="selectedChristmasItem.sourceUrl" target="_blank" rel="noopener noreferrer"> · {{ $i18n.locale === 'en' ? 'Original' : '原文' }}</a>
+                        </p>
                     </div>
                 </aside>
 
@@ -545,6 +558,7 @@ import {
 import { generatePaperPoster } from '@/utils/paperPoster/api'
 import { generatePhotoEditorial } from '@/utils/photoEditorial/api'
 import oaiImageData from '@/data/oaiImageTemplates.json'
+import christmasCardPrompts from '@/data/christmasCardPrompts.json'
 import { useIllustrationStyles } from '@/composables/useIllustrationStyles'
 import {
     isObjectDoodlePosterNoTextStyle,
@@ -601,6 +615,9 @@ export default {
             styleSearchOpen: false,
             styleSearchQuery: '',
             oaiItems: oaiImageData.items,
+            christmasItems: christmasCardPrompts,
+            displayOrderChristmas: [],
+            christmasSource: 'https://github.com/YouMind-OpenLab/awesome-christmas-card-prompts/tree/f1cf8f99808e5d54510519c98acb0305db80d8b7',
             selectedOaiTemplateId: null,
             displayOrderOai: [],
             advancedSettingsOpen: false,
@@ -669,7 +686,18 @@ export default {
         },
         selectedOaiItem() {
             if (!this.selectedOaiTemplateId) return null
-            return this.oaiItems.find((x) => x.id === this.selectedOaiTemplateId) || null
+            return [...this.oaiItems, ...this.christmasItems].find((x) => x.id === this.selectedOaiTemplateId) || null
+        },
+        selectedChristmasItem() {
+            return this.christmasItems.find((item) => item.id === this.selectedOaiTemplateId) || null
+        },
+        visibleChristmasItems() {
+            return this.christmasItems.filter(item => this.matchesStyleSearch(item.title, item.titleZh, item.prompt, item.promptZh, item.author, '圣诞 Christmas card'))
+        },
+        displayedChristmasItems() {
+            if (this.isSearchingStyles || !this.displayOrderChristmas.length) return this.visibleChristmasItems
+            const byId = new Map(this.visibleChristmasItems.map(item => [item.id, item]))
+            return this.displayOrderChristmas.map(id => byId.get(id)).filter(Boolean)
         },
         visibleOaiItems() {
             return this.oaiItems.filter(item => this.matchesStyleSearch(item.title, item.prompt, item.description))
@@ -694,7 +722,7 @@ export default {
                 sketch: 'styleTabSketch', paint: 'styleTabPaint', toon: 'styleTabToon',
                 collage: 'styleTabCollage', chinese: 'styleTabChinese', other: 'styleTabOther', skill: 'styleTabSkill',
             }
-            return visibleIllustrationCategoryIds(this.styles).map(id => ({ id, label: this.$t(`aiPicture.${keys[id]}`) }))
+            return [...visibleIllustrationCategoryIds(this.styles).map(id => ({ id, label: this.$t(`aiPicture.${keys[id]}`) })), { id: 'christmas', label: this.$i18n.locale === 'en' ? 'Christmas' : '圣诞贺卡' }]
         },
         promptPlaceholder() {
             if (this.isXiaoheiStyle(this.selectedStyle)) {
@@ -715,6 +743,7 @@ export default {
             if (this.isSearchingStyles) {
                 return this.styles.filter(style => this.matchesStyleSearch(style.artStyle, style.title, style.prompt, style.basePrompt, style.elementDetails, style.inputTemplate))
             }
+            if (this.activeStyleCategory === 'christmas') return []
             return stylesForIllustrationTab(this.activeStyleCategory, this.styles)
         },
         handrawStyleReferenceActive() {
@@ -1277,6 +1306,9 @@ export default {
             this.selectedStyleId = null
             this.subjectScene = (item.prompt || '').trim()
         },
+        selectChristmasTemplate(item) {
+            this.selectOaiTemplate({ ...item, prompt: this.$i18n.locale === 'en' ? item.prompt : item.promptZh })
+        },
 
         toggleSizeMenu() {
             const next = !this.sizeMenuOpen
@@ -1543,6 +1575,9 @@ export default {
             this.displayOrder = shuffle(this.visibleStyles.map(s => s.id))
             if (this.activeStyleCategory !== 'curated') {
                 this.displayOrderOai = shuffle(this.visibleOaiItems.map(x => x.id))
+            }
+            if (this.activeStyleCategory === 'christmas') {
+                this.displayOrderChristmas = shuffle(this.visibleChristmasItems.map(x => x.id))
             }
             this.$nextTick(() => {
                 const list = this.$refs.styleListRef
@@ -2714,6 +2749,8 @@ export default {
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
 }
+.christmas-credit { margin: 8px 0 0; color: #756e69; font-size: 12px; line-height: 1.6; }
+.christmas-credit a { color: #6650a5; }
 
 .style-tab-row::-webkit-scrollbar {
     display: none;
